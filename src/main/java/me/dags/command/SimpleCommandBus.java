@@ -1,7 +1,6 @@
 package me.dags.command;
 
 import me.dags.command.command.Command;
-import me.dags.command.command.CommandExecutor;
 import me.dags.command.utils.MarkdownWriter;
 
 import java.io.IOException;

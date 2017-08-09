@@ -18,27 +18,36 @@ public class Command<T> {
         this.aliases = new ArrayList<>(aliases);
     }
 
-    public void processCommand(T source, String rawInput) throws Exception {
+    public void processCommand(T source, String rawInput) throws CommandException {
         Input input = new Input(rawInput);
-        LinkedList<Exception> exceptions = new LinkedList<>();
+        CommandException last = null;
 
         for (CommandExecutor executor : executors) {
-            try {
-                String permission = executor.getPermission().value();
-                if (testPermission(source, permission)) {
-                    Context context = executor.parse(source, input);
+            String permission = executor.getPermission().value();
+            if (testPermission(source, permission)) {
+                Context context;
+
+                try {
+                    context = executor.parse(source, input);
+                } catch (CommandException e) {
+                    last = e;
+                    continue;
+                }
+
+                try {
                     executor.invoke(context);
                     return;
-                } else {
-                    throw new CommandException("Requires the permission %s", permission);
+                } catch (CommandException e) {
+                    last = e;
                 }
-            } catch (Exception e) {
-                exceptions.add(e);
+
+            } else {
+                last = new CommandException("Requires the permission %s", permission);
             }
         }
 
-        if (!exceptions.isEmpty()) {
-            throw exceptions.getLast();
+        if (last != null) {
+            throw last;
         }
     }
 

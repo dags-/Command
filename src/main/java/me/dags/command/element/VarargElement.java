@@ -2,7 +2,6 @@ package me.dags.command.element;
 
 import me.dags.command.command.CommandException;
 import me.dags.command.command.Context;
-import me.dags.command.command.Flags;
 import me.dags.command.command.Input;
 
 import java.util.List;

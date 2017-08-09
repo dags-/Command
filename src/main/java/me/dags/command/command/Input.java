@@ -1,8 +1,8 @@
 package me.dags.command.command;
 
 import com.google.common.collect.ImmutableList;
+import me.dags.command.annotation.Permission;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,6 +24,10 @@ public class Input {
         return pos + 1 < args.size();
     }
 
+    public String peek() {
+        return args.get(pos + 1);
+    }
+
     public String next() throws CommandException {
         if (!hasNext()) {
             throw new CommandException("Not enough args");
@@ -31,25 +35,44 @@ public class Input {
         return args.get(++pos);
     }
 
-    public String peek() {
-        return args.get(pos + 1);
+    public Input slice(int start) {
+        return slice(start, rawInput.length());
+    }
+
+    public Input slice(int start, int end) {
+        String s = rawInput.substring(start, end);
+        return new Input(s);
     }
 
     public int getPos() {
         return pos;
     }
 
-    public Input last() {
-        pos = args.size() - 2;
-        return this;
-    }
+    public int getCursor() {
+        if (hasNext()) {
+            String next = peek();
+            int index = 0;
 
-    public int remaining() {
-        return args.size() - (pos + 1);
+            for (int i = 0; i < pos + 1; i++) {
+                index += args.get(i).length();
+                if (i > 0) {
+                    index++; // space
+                }
+            }
+
+            return rawInput.indexOf(next, index);
+        }
+
+        return 0;
     }
 
     public void setPos(int pos) {
         this.pos = pos;
+    }
+
+    public Input last() {
+        pos = args.size() - 2;
+        return this;
     }
 
     public Input reset() {

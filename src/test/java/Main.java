@@ -87,13 +87,13 @@ public class Main extends JFrame implements KeyListener {
     private void submit(String raw) {
         try {
             Input input = new Input(raw);
-            Optional<Command<?>> command = bus.getCommand(input.peek());
+            Optional<Command<?>> command = bus.getCommand(input.next());
             if (command.isPresent()) {
-                command.get().processCommand(null, input.getRawInput());
+                command.get().processCommand(null, input.slice(input.getCursor()).getRawInput());
             } else {
                 System.out.println("Command not found!");
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }
@@ -101,9 +101,9 @@ public class Main extends JFrame implements KeyListener {
     private void suggest(String raw) {
         try {
             Input input = new Input(raw);
-            Optional<Command<?>> command = bus.getCommand(input.peek());
+            Optional<Command<?>> command = bus.getCommand(input.next());
             if (command.isPresent()) {
-                suggestions = command.get().suggestCommand(null, input.getRawInput());
+                suggestions = command.get().suggestCommand(null, input.slice(input.getCursor()).getRawInput());
                 System.out.println(suggestions);
             } else {
                 System.out.println("Command not found!");

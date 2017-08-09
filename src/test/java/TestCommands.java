@@ -16,13 +16,21 @@ public class TestCommands {
         System.out.printf("Set user: %s, permission: %s, to: %s\n", user, perm, value);
     }
 
-    @Flag("t")
-    @Flag(value = "p", type = TestEnum.class)
+    @Permission
     @Command("user promote <user>")
-    public void two(String user, Flags flags) {
-        System.out.printf("Promote user: %s, bool flag: %s, int flag: %s", user, flags.getOr("t", false), flags.getOr("p", TestEnum.NO));
+    public void twoA(String user) {
+        System.out.printf("PromoteA user: %s", user);
     }
 
+    @Flag("t")
+    @Flag(value = "p", type = TestEnum.class)
+    @Permission
+    @Command("user promote <user>")
+    public void twoB(String user, Flags flags) {
+        System.out.printf("PromoteB user: %s, bool flag: %s, int flag: %s", user, flags.getOr("t", false), flags.getOr("p", TestEnum.NO));
+    }
+
+    @Permission
     @Command("user demote <user>")
     @Description("Demote a user")
     public void three(String user, TestEnum... examples) {

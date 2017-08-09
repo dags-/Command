@@ -23,7 +23,6 @@ public class FlagElement implements Element {
 
     @Override
     public void parse(Input input, Context context) throws CommandException {
-        int pos = input.getPos();
         input.reset();
 
         Flags flags = new Flags();
@@ -47,7 +46,6 @@ public class FlagElement implements Element {
         }
 
         context.add(id, flags);
-        input.setPos(pos);
 
         if (delayed != null) {
             throw delayed;

@@ -3,10 +3,9 @@ package me.dags.command.command;
 import me.dags.command.annotation.Description;
 import me.dags.command.annotation.Permission;
 import me.dags.command.annotation.Usage;
-import me.dags.command.element.Element;
 import me.dags.command.annotation.processor.Param;
+import me.dags.command.element.Element;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -48,6 +47,10 @@ public class CommandExecutor implements Comparable<CommandExecutor> {
             element.parse(input, context);
         }
 
+        if (input.hasNext()) {
+            throw new CommandException("Too many arguments for %s", getUsage().value());
+        }
+
         return context;
     }
 
@@ -66,7 +69,7 @@ public class CommandExecutor implements Comparable<CommandExecutor> {
         }
     }
 
-    public void invoke(Context context) throws CommandException, InvocationTargetException, IllegalAccessException {
+    public void invoke(Context context) throws CommandException {
         Object[] args = new Object[params.size()];
 
         for (int i = 0; i < params.size(); i++) {
@@ -80,7 +83,11 @@ public class CommandExecutor implements Comparable<CommandExecutor> {
             args[i] = val;
         }
 
-        method.invoke(object, args);
+        try {
+            method.invoke(object, args);
+        } catch (Throwable t) {
+            throw new CommandException(t.getMessage());
+        }
     }
 
     public Usage getUsage() {
@@ -96,8 +103,14 @@ public class CommandExecutor implements Comparable<CommandExecutor> {
     }
 
     @Override
+    public String toString() {
+        return getUsage().value();
+    }
+
+    @Override
     public int compareTo(CommandExecutor executor) {
-        return Integer.compare(elements.size(), executor.elements.size());
+        int result = Integer.compare(elements.size(), executor.elements.size());
+        return result != 0 ? result : getUsage().value().compareTo(executor.getUsage().value());
     }
 
     public static Builder builder() {

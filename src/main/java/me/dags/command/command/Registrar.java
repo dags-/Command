@@ -1,7 +1,7 @@
 package me.dags.command.command;
 
-import me.dags.command.element.ElementFactory;
 import me.dags.command.annotation.processor.Processor;
+import me.dags.command.element.ElementFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;

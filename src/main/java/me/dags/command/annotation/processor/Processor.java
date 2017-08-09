@@ -104,6 +104,8 @@ public class Processor {
                 elements.add(element);
             }
         }
+
+        elements.remove(0);
     }
 
     private Map<String, Element> buildFlags(Flag[] flags) {
@@ -138,7 +140,20 @@ public class Processor {
             return usage;
         }
 
-        final String value = join(tokens, " ", "<", ">");
+        Flag[] flags = method.getAnnotationsByType(Flag.class);
+
+        StringBuilder flagBuilder = new StringBuilder();
+        if (flags != null) {
+            for (Flag flag : flags) {
+                flagBuilder.append(' ').append('-').append(flag.value());
+
+                if (flag.type() != boolean.class && flag.type() != Boolean.class) {
+                    flagBuilder.append(' ').append('(').append(flag.type().getSimpleName()).append(')');
+                }
+            }
+        }
+
+        final String value = join(tokens, " ", "<", ">") + flagBuilder.toString();
 
         return new Usage() {
 
