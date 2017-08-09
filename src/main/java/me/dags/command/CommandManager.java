@@ -17,34 +17,34 @@ import java.util.logging.Logger;
 /**
  * @author dags <dags@dags.me>
  */
-public abstract class AbstractCommandBus<T extends Command<?>> {
+public abstract class CommandManager<T extends Command<?>> {
 
     private final Object owner;
     private Registrar<T> registrar;
 
-    public AbstractCommandBus(Builder<T> builder) {
+    public CommandManager(Builder<T> builder) {
         this.owner = builder.owner;
         this.registrar = Registrar.of(builder.elementFactory, builder.commandFactory);
+        
     }
 
-    public AbstractCommandBus registerPackage(Class<?> child) {
+    public CommandManager<T> registerPackage(Class<?> child) {
         checkAccess();
         return registerPackage(true, child);
     }
 
-    public AbstractCommandBus registerPackage(boolean recursive, Class<?> child) {
+    public CommandManager<T> registerPackage(boolean recursive, Class<?> child) {
         checkAccess();
         return registerPackage(recursive, child.getPackage().getName());
     }
 
-    public AbstractCommandBus registerPackage(String... path) {
+    public CommandManager<T> registerPackage(String... path) {
         checkAccess();
         return registerPackage(true, path);
     }
 
-    public AbstractCommandBus registerPackage(boolean recurse, String... path) {
+    public CommandManager<T> registerPackage(boolean recurse, String... path) {
         checkAccess();
-
         info("Scanning package {} for commands...", Arrays.toString(path));
         ScanResult result = new FastClasspathScanner(path).disableRecursiveScanning(!recurse).scan();
         List<String> matches = result.getNamesOfAllClasses();
@@ -60,7 +60,7 @@ public abstract class AbstractCommandBus<T extends Command<?>> {
         return this;
     }
 
-    public AbstractCommandBus register(Object o) {
+    public CommandManager<T> register(Object o) {
         checkAccess();
         if (registrar != null) {
             registrar.register(o);
@@ -68,7 +68,7 @@ public abstract class AbstractCommandBus<T extends Command<?>> {
         return this;
     }
 
-    public AbstractCommandBus register(Class<?> c) {
+    public CommandManager<T> register(Class<?> c) {
         checkAccess();
         try {
             Object o = c.newInstance();
@@ -89,17 +89,20 @@ public abstract class AbstractCommandBus<T extends Command<?>> {
         }
     }
 
-    protected Registrar<T> getRegistrar() {
-        checkAccess();
-        return registrar;
-    }
-
-    protected abstract void submit(Object owner, T command);
-
     private void checkAccess() {
         if (registrar == null) {
             throw new IllegalStateException("Attempted to access Registrar after it has been disposed!");
         }
+    }
+
+    protected abstract void submit(Object owner, T command);
+
+    protected void info(String message, Object... args) {
+        Logger.getLogger("CommandBus").info(String.format(message, args));
+    }
+
+    protected void warn(String message, Object... args) {
+        Logger.getLogger("CommandBus").log(Level.WARNING, String.format(message, args));
     }
 
     public static <T extends Command<?>> Builder<T> builder() {
@@ -127,16 +130,8 @@ public abstract class AbstractCommandBus<T extends Command<?>> {
             return this;
         }
 
-        public <V extends AbstractCommandBus<T>> V build(Function<Builder<T>, V> function) {
+        public <V extends CommandManager<T>> V build(Function<Builder<T>, V> function) {
             return function.apply(this);
         }
-    }
-
-    protected void info(String message, Object... args) {
-        Logger.getLogger("CommandBus").info(String.format(message, args));
-    }
-
-    protected void warn(String message, Object... args) {
-        Logger.getLogger("CommandBus").log(Level.WARNING, String.format(message, args));
     }
 }

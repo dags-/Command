@@ -1,7 +1,6 @@
 package me.dags.command.command;
 
 import com.google.common.collect.ImmutableList;
-import me.dags.command.annotation.Permission;
 
 import java.util.LinkedList;
 import java.util.List;

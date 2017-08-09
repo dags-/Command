@@ -1,5 +1,4 @@
-package me.dags.command;
-
+import me.dags.command.CommandManager;
 import me.dags.command.command.Command;
 import me.dags.command.utils.MarkdownWriter;
 
@@ -10,7 +9,7 @@ import java.util.stream.Collectors;
 /**
  * @author dags <dags@dags.me>
  */
-public class SimpleCommandBus extends AbstractCommandBus<Command<Object>> {
+public class SimpleCommandBus extends CommandManager<Command<Object>> {
 
     private final Map<String, Command<?>> commands = new HashMap<>();
 

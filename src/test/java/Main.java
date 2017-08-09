@@ -1,4 +1,3 @@
-import me.dags.command.SimpleCommandBus;
 import me.dags.command.command.Command;
 import me.dags.command.command.Input;
 
