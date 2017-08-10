@@ -28,6 +28,11 @@ public abstract class CommandManager<T extends Command<?>> {
         
     }
 
+    public Object getOwner() {
+        checkAccess();
+        return owner;
+    }
+
     public CommandManager<T> registerPackage(Class<?> child) {
         checkAccess();
         return registerPackage(true, child);
@@ -45,10 +50,10 @@ public abstract class CommandManager<T extends Command<?>> {
 
     public CommandManager<T> registerPackage(boolean recurse, String... path) {
         checkAccess();
-        info("Scanning package {} for commands...", Arrays.toString(path));
+        info("Scanning package %s for commands...", Arrays.toString(path));
         ScanResult result = new FastClasspathScanner(path).disableRecursiveScanning(!recurse).scan();
         List<String> matches = result.getNamesOfAllClasses();
-        info("Discovered {} Command classes in package {}", matches.size(), path);
+        info("Discovered %s Command classes in package %s", matches.size(), path);
         for (String name : matches) {
             try {
                 Class<?> clazz = Class.forName(name);
@@ -56,14 +61,6 @@ public abstract class CommandManager<T extends Command<?>> {
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
-        }
-        return this;
-    }
-
-    public CommandManager<T> register(Object o) {
-        checkAccess();
-        if (registrar != null) {
-            registrar.register(o);
         }
         return this;
     }
@@ -79,13 +76,18 @@ public abstract class CommandManager<T extends Command<?>> {
         return this;
     }
 
+    public CommandManager<T> register(Object o) {
+        checkAccess();
+        int count = registrar.register(o);
+        info("Registered %s command(s) from %s", count, o.getClass());
+        return this;
+    }
+
     public void submit() {
         checkAccess();
-        if (registrar != null) {
-            Collection<T> commands = registrar.build();
-            for (T t : commands) {
-                submit(owner, t);
-            }
+        Collection<T> commands = registrar.build();
+        for (T t : commands) {
+            submit(owner, t);
         }
     }
 

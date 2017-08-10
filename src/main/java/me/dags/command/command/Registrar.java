@@ -30,8 +30,8 @@ public class Registrar<T extends Command<?>> {
         return elementFactory;
     }
 
-    public void register(Object source) {
-        processor.process(source);
+    public int register(Object source) {
+        return processor.process(source);
     }
 
     public void register(Collection<String> aliases, CommandExecutor executor) {

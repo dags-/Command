@@ -58,7 +58,7 @@ public interface ValueParser<T> {
                     return null;
                 }
             }
-            throw new CommandException("Invalid input %s, expected: %s", next, options);
+            throw new CommandException("Invalid arg '%s'", next);
         };
     }
 }

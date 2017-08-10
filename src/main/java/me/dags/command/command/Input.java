@@ -29,7 +29,7 @@ public class Input {
 
     public String next() throws CommandException {
         if (!hasNext()) {
-            throw new CommandException("Not enough args");
+            throw new CommandException("Not enough args provided: '%s'", rawInput);
         }
         return args.get(++pos);
     }

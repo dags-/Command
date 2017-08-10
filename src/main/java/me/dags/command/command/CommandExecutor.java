@@ -43,12 +43,19 @@ public class CommandExecutor implements Comparable<CommandExecutor> {
             }
         }
 
+        int priority = 0;
         for (Element element : elements) {
-            element.parse(input, context);
+            try {
+                element.parse(input, context);
+            } catch (CommandException e) {
+                throw e.priority(priority);
+            }
+
+            priority++;
         }
 
         if (input.hasNext()) {
-            throw new CommandException("Too many arguments for %s", getUsage().value());
+            throw new CommandException("Too many args provided: '%s'", input.getRawInput()).priority(priority).usage(getUsage().value());
         }
 
         return context;
@@ -77,7 +84,7 @@ public class CommandExecutor implements Comparable<CommandExecutor> {
             Object val = context.get(param, param.getType());
 
             if (val == null) {
-                throw new CommandException("Parameter %s missing from Context", param.getId());
+                throw new CommandException("Parameter %s missing from Context", param.getId()).usage(getUsage().value());
             }
 
             args[i] = val;

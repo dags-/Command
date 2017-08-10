@@ -1,9 +1,6 @@
 package me.dags.command.command;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author dags <dags@dags.me>
@@ -20,7 +17,7 @@ public class Command<T> {
 
     public void processCommand(T source, String rawInput) throws CommandException {
         Input input = new Input(rawInput);
-        CommandException last = null;
+        List<CommandException> exceptions = new ArrayList<>(executors.size());
 
         for (CommandExecutor executor : executors) {
             String permission = executor.getPermission().value();
@@ -30,7 +27,7 @@ public class Command<T> {
                 try {
                     context = executor.parse(source, input);
                 } catch (CommandException e) {
-                    last = e;
+                    exceptions.add(e);
                     continue;
                 }
 
@@ -38,16 +35,18 @@ public class Command<T> {
                     executor.invoke(context);
                     return;
                 } catch (CommandException e) {
-                    last = e;
+                    exceptions.add(e);
                 }
 
             } else {
-                last = new CommandException("Requires the permission %s", permission);
+                exceptions.add(new CommandException("Requires the permission %s", permission));
             }
         }
 
-        if (last != null) {
-            throw last;
+        if (!exceptions.isEmpty()) {
+            Collections.sort(exceptions);
+            int last = exceptions.size() - 1;
+            throw exceptions.get(last);
         }
     }
 

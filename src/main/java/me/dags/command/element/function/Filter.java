@@ -8,13 +8,17 @@ import java.util.function.BiPredicate;
 @FunctionalInterface
 public interface Filter extends BiPredicate<String, String> {
 
-    Filter STARTS_WITH = String::startsWith;
+    Filter STARTS_WITH = ignoreCase(String::startsWith);
 
-    Filter ENDS_WITH = String::endsWith;
+    Filter ENDS_WITH = ignoreCase(String::endsWith);
 
-    Filter CONTAINS = String::contains;
+    Filter CONTAINS = ignoreCase(String::contains);
 
-    Filter EQUALS = String::equals;
+    Filter EQUALS = ignoreCase(String::contentEquals);
 
     Filter EQUALS_IGNORE_CASE = String::equalsIgnoreCase;
+
+    static Filter ignoreCase(BiPredicate<String, String> filter) {
+        return (s1, s2) -> filter.test(s1.toUpperCase(), s2.toUpperCase());
+    }
 }

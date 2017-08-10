@@ -23,10 +23,11 @@ public class NodeElement extends ValueElement {
 
     @Override
     public void parse(Input input, Context context) throws CommandException {
-        String next = input.next();
+        getParser().parse(input);
+    }
 
-        if (getOptions().get().noneMatch(s -> s.equalsIgnoreCase(next))) {
-            throw new CommandException("Expected '%s' but found '%s'", main, next);
-        }
+    @Override
+    public String toString() {
+        return main;
     }
 }

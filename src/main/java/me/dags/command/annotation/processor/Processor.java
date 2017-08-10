@@ -31,8 +31,9 @@ public class Processor {
         this.registrar = registrar;
     }
 
-    public void process(Object o) {
+    public int process(Object o) {
         Class<?> c = o.getClass();
+        int count = 0;
         do {
             for (Method method : c.getMethods()) {
                 Command command = method.getAnnotation(Command.class);
@@ -45,10 +46,12 @@ public class Processor {
                     Token root = tokens.get(0);
                     CommandExecutor executor = processMethod(o, method, tokens);
                     registrar.register(root.getAliases(), executor);
+                    count++;
                 }
             }
             c = c.getSuperclass();
         } while (c != null && c != Object.class);
+        return count;
     }
 
     private CommandExecutor processMethod(Object object, Method method, List<Token> tokens) {
