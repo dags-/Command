@@ -1,5 +1,6 @@
 package me.dags.command.utils;
 
+import me.dags.command.annotation.Role;
 import me.dags.command.command.CommandExecutor;
 
 import java.io.Closeable;
@@ -18,17 +19,20 @@ public class MarkdownWriter implements Closeable {
     }
 
     public MarkdownWriter writeHeaders() {
-        write("| Command | Permission | Description |").newLine();
-        write("| :------ | :--------- | :---------- |");
+        write("| Command | Permission | Default Role  | Description |").newLine();
+        write("| :------ | :--------- | :-----------  | :---------- |");
         return this;
     }
 
     public MarkdownWriter writeCommand(CommandExecutor executor) {
-        String command = executor.getUsage().value();
-        String permission = executor.getPermission().value();
-        String description = executor.getDescription().value();
-        newLine().write(String.format("| `%s` | `%s` | %s |", command, permission, description));
-        return this;
+        String command = ifEmpty(executor.getUsage().value(), "undefined");
+        String permission = ifEmpty(executor.getPermission().value(), " ");
+        String description = ifEmpty(executor.getDescription().value(), "undefined");
+
+        Role role = executor.getPermission().role();
+        String defaultRole = role.permit() ? ifEmpty(role.value(), " ") : " ";
+
+        return newLine().write(String.format("| `%s` | `%s` | %s | %s |", command, permission, defaultRole, description));
     }
 
     private MarkdownWriter write(String string) {
@@ -43,6 +47,10 @@ public class MarkdownWriter implements Closeable {
     private MarkdownWriter newLine() {
         write("\n");
         return this;
+    }
+
+    private String ifEmpty(String in, String other) {
+        return in.isEmpty() ? other : in;
     }
 
     @Override
