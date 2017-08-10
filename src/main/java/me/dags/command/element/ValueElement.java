@@ -42,7 +42,7 @@ public class ValueElement implements Element {
             return;
         }
 
-        if (options == Options.EMPTY) {
+        if (getOptions() == Options.EMPTY) {
             Object value = parser.parse(input);
             context.add(key, value);
             return;
@@ -73,7 +73,7 @@ public class ValueElement implements Element {
     @Override
     public void suggest(Input input, List<String> suggestions) {
         if (!input.hasNext()) {
-            options.get().sorted(SORTER).forEach(suggestions::add);
+            getOptions().get().sorted(SORTER).forEach(suggestions::add);
             return;
         }
 
@@ -83,11 +83,11 @@ public class ValueElement implements Element {
                 return;
             }
 
-            if (options.get().anyMatch(s -> s.equalsIgnoreCase(next))) {
+            if (getOptions().get().anyMatch(s -> s.equalsIgnoreCase(next))) {
                 return;
             }
 
-            options.get().filter(s -> filter.test(s, next)).sorted(SORTER).forEach(suggestions::add);
+            getOptions().get().filter(s -> filter.test(s, next)).sorted(SORTER).forEach(suggestions::add);
         } catch (CommandException e) {
             e.printStackTrace();
         }
@@ -102,7 +102,7 @@ public class ValueElement implements Element {
 
             String next = input.peek();
 
-            return options.get().anyMatch(s -> s.contains(next));
+            return getOptions().get().anyMatch(s -> getFilter().test(s, next));
         }
         return false;
     }
