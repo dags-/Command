@@ -48,7 +48,7 @@ public class CommandExecutor implements Comparable<CommandExecutor> {
             try {
                 element.parse(input, context);
             } catch (CommandException e) {
-                throw e.priority(priority);
+                throw e.priority(priority).usage(getUsage().value());
             }
 
             priority++;
