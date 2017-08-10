@@ -16,7 +16,7 @@ import java.util.Optional;
 public class Main extends JFrame implements KeyListener {
 
     public static void main(String[] args) {
-        new Main();
+         new Main();
     }
 
     private final JTextField input = new JTextField();

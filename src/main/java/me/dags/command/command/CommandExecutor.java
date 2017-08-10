@@ -116,8 +116,8 @@ public class CommandExecutor implements Comparable<CommandExecutor> {
 
     @Override
     public int compareTo(CommandExecutor executor) {
-        int result = Integer.compare(elements.size(), executor.elements.size());
-        return result != 0 ? result : getUsage().value().compareTo(executor.getUsage().value());
+        int result = Integer.compare(executor.elements.size(), elements.size());
+        return result != 0 ? result : executor.getUsage().value().compareTo(getUsage().value());
     }
 
     public static Builder builder() {

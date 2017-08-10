@@ -52,12 +52,13 @@ public class Registrar<T extends Command<?>> {
         }
 
         builder.aliases.addAll(aliases);
-        builder.list.add(executor);
+        builder.executors.add(executor);
     }
 
     public Collection<T> build() {
         return builders.values().stream().distinct()
-                .map(builder -> getCommandFactory().create(builder.aliases, builder.list))
+                .peek(builder -> Collections.sort(builder.executors))
+                .map(builder -> getCommandFactory().create(builder.aliases, builder.executors))
                 .collect(Collectors.toList());
     }
 
@@ -67,7 +68,7 @@ public class Registrar<T extends Command<?>> {
 
     private static class Entry {
 
-        private final List<CommandExecutor> list = new ArrayList<>();
+        private final List<CommandExecutor> executors = new ArrayList<>();
         private final Set<String> aliases = new LinkedHashSet<>();
     }
 }
