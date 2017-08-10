@@ -17,6 +17,12 @@ public interface Element {
 
     boolean test(Input input);
 
+    default int getPriority() {
+        return PRIORITY;
+    }
+
+    int PRIORITY = 1;
+
     Element EMPTY = new Element() {
         @Override
         public void parse(Input input, Context context) throws CommandException {}

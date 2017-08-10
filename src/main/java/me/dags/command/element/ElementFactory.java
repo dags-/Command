@@ -37,31 +37,44 @@ public class ElementFactory {
         ValueParser<?> parser = getParser(param);
         Options options = getOptions(param);
         Filter filter = getFilter(param);
+        int priority = param.getParamType().priority();
 
         if (parser == null) {
             throw new UnsupportedOperationException("Invalid element type " + param.getType());
         }
 
         if (param.getParamType() == Param.Type.VARARG) {
-            return createVarargElement(param.getId(), param.getType(), options, filter, parser, flags);
+            return createVarargElement(param.getId(), priority, param.getType(), options, filter, parser, flags);
         }
 
         if (param.getParamType() == Param.Type.FLAG) {
             return createFlagElement(param.getId(), param.getType(), options, filter, parser, flags);
         }
 
-        return createValueElement(param.getId(), param.getType(), options, filter, parser);
+        return createValueElement(param.getId(), priority, param.getType(), options, filter, parser);
     }
 
-    public Element createValueElement(String id, Class<?> type, Options options, Filter filter, ValueParser parser) {
-        return new ValueElement(id, options, filter, parser);
+    public final Element createValueElement(String id, Class<?> type, Options options, Filter filter, ValueParser parser) {
+        return createValueElement(id, Element.PRIORITY, type, options, filter, parser);
     }
 
-    public Element createVarargElement(String id, Class<?> type, Options options, Filter filter, ValueParser parser, Map<String, Element> flags) {
-        return new VarargElement(createValueElement(id, type, options, filter, parser), flags.keySet());
+    public final Element createVarargElement(String id, Class<?> type, Options options, Filter filter, ValueParser parser, Map<String, Element> flags) {
+        return createVarargElement(id, Param.Type.VARARG.priority(), type, options, filter, parser, flags);
     }
 
-    public Element createFlagElement(String id, Class<?> type, Options options, Filter filter, ValueParser parser, Map<String, Element> flags) {
+    public final Element createFlagElement(String id, Class<?> type, Options options, Filter filter, ValueParser parser, Map<String, Element> flags) {
+        return createFlagElement(id, Param.Type.FLAG.priority(), type, options, filter, parser, flags);
+    }
+
+    public Element createValueElement(String id, int priority, Class<?> type, Options options, Filter filter, ValueParser parser) {
+        return new ValueElement(id, priority, options, filter, parser);
+    }
+
+    public Element createVarargElement(String id, int priority, Class<?> type, Options options, Filter filter, ValueParser parser, Map<String, Element> flags) {
+        return new VarargElement(createValueElement(id, priority, type, options, filter, parser), flags.keySet());
+    }
+
+    public Element createFlagElement(String id, int priority, Class<?> type, Options options, Filter filter, ValueParser parser, Map<String, Element> flags) {
         return new FlagElement(id, flags);
     }
 
@@ -100,7 +113,7 @@ public class ElementFactory {
     @SuppressWarnings("unchecked")
     public ValueParser<?> getParser(Class<?> type) {
         if (Enum.class.isAssignableFrom(type)) {
-            return ValueParser.of(s -> Enum.valueOf((Class<? extends Enum>) type, s.toUpperCase()));
+            return ValueParser.enumParser((Class<? extends Enum>) type);
         }
 
         return get(type, parsers, defaultParser);

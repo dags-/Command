@@ -37,13 +37,24 @@ public class Param {
     }
 
     public enum Type {
-        ANY,
-        FLAG,
-        JOIN,
-        ONE,
-        SOURCE,
-        VARARG,
+        NODE(0),
+        SOURCE(0),
+        ANY(1),
+        ONE(1),
+        JOIN(2),
+        VARARG(3),
+        FLAG(4),
         ;
+
+        private final int priority;
+
+        Type(int priority) {
+            this.priority = priority;
+        }
+
+        public int priority() {
+            return priority;
+        }
     }
 
     public static Param of(IDGenerator generator, Parameter parameter) {

@@ -130,7 +130,7 @@ public class Processor {
                 ValueParser<?> parser = factory.getParser(type);
                 Options options = factory.getOptions(type);
                 Filter filter = factory.getFilter(type);
-                builder.put(key, factory.createValueElement(id, type, options, filter, parser));
+                builder.put(key, factory.createValueElement(id, 0, type, options, filter, parser));
             }
         }
 
@@ -148,12 +148,20 @@ public class Processor {
         StringBuilder flagBuilder = new StringBuilder();
         if (flags != null) {
             for (Flag flag : flags) {
-                flagBuilder.append(' ').append('-').append(flag.value());
+                if (flagBuilder.length() > 0) {
+                    flagBuilder.append(" | ");
+                }
+
+                flagBuilder.append("-").append(flag.value());
 
                 if (flag.type() != boolean.class && flag.type() != Boolean.class) {
-                    flagBuilder.append(' ').append('(').append(flag.type().getSimpleName()).append(')');
+                    flagBuilder.append(" <").append(flag.type().getSimpleName()).append(">");
                 }
             }
+        }
+
+        if (flagBuilder.length() > 0) {
+            flagBuilder.insert(0, " (").append(")");
         }
 
         final String value = join(tokens, " ", "<", ">") + flagBuilder.toString();

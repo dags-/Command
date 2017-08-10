@@ -1,8 +1,7 @@
-import me.dags.command.annotation.Command;
-import me.dags.command.annotation.Description;
-import me.dags.command.annotation.Flag;
-import me.dags.command.annotation.Permission;
+import me.dags.command.annotation.*;
 import me.dags.command.command.Flags;
+
+import java.util.Collection;
 
 /**
  * @author dags <dags@dags.me>
@@ -30,12 +29,10 @@ public class TestCommands {
         System.out.printf("PromoteB user: %s, bool flag: %s, int flag: %s", user, flags.getOr("t", false), flags.getOr("p", TestEnum.NO));
     }
 
-    @Permission
+    @Permission(role = @Role("admin"))
     @Command("user demote <user>")
     @Description("Demote a user")
-    public void three(String user, TestEnum... examples) {
-        for (TestEnum num : examples) {
-            System.out.printf("User: %s, Enum: %s\n", user, num);
-        }
+    public void three(String user, Collection<TestEnum> examples) {
+        System.out.printf("User: %s, Enum: %s\n", user, examples);
     }
 }

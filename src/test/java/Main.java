@@ -16,7 +16,11 @@ import java.util.Optional;
 public class Main extends JFrame implements KeyListener {
 
     public static void main(String[] args) {
-         new Main();
+        for (Enum e : TestEnum.class.getEnumConstants()) {
+            System.out.println(e.name());
+        }
+
+        new Main();
     }
 
     private final JTextField input = new JTextField();

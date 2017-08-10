@@ -1,5 +1,7 @@
 package me.dags.command.command;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.*;
 
 /**
@@ -11,8 +13,8 @@ public class Command<T> {
     private final List<String> aliases;
 
     public Command(Collection<String> aliases, Collection<CommandExecutor> executors) {
-        this.executors = new ArrayList<>(executors);
-        this.aliases = new ArrayList<>(aliases);
+        this.executors = ImmutableList.copyOf(executors);
+        this.aliases = ImmutableList.copyOf(aliases);
     }
 
     public void processCommand(T source, String rawInput) throws CommandException {

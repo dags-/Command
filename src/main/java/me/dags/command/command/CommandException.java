@@ -6,15 +6,15 @@ package me.dags.command.command;
 public class CommandException extends Exception implements Comparable<CommandException> {
 
     private int priority;
-    private String usage;
+    private String args;
 
     public CommandException(String message, Object... args) {
         super(String.format(message, args));
         this.priority = 0;
     }
 
-    public CommandException usage(String usage) {
-        this.usage = usage;
+    public CommandException args(String usage) {
+        this.args = usage;
         return this;
     }
 
@@ -25,10 +25,10 @@ public class CommandException extends Exception implements Comparable<CommandExc
 
     @Override
     public String getMessage() {
-        if (usage == null) {
+        if (args == null) {
             return super.getMessage();
         }
-        return String.format("%s. Expected: %s", super.getMessage(), usage);
+        return String.format("%s. Expected args: %s", super.getMessage(), args);
     }
 
     @Override

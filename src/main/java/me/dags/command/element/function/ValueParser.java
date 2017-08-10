@@ -6,7 +6,6 @@ import me.dags.command.command.Input;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * @author dags <dags@dags.me>
@@ -14,51 +13,69 @@ import java.util.function.Function;
 @FunctionalInterface
 public interface ValueParser<T> {
 
-    T parse(Input input) throws CommandException;
+    T parse(String input) throws CommandException;
+
+    default T parse(Input input) throws CommandException {
+        return parse(input.next());
+    }
 
     ValueParser<?> EMPTY = input -> null;
 
     Map<Class<?>, ValueParser<?>> DEFAULTS = ImmutableMap.<Class<?>, ValueParser<?>>builder()
-            .put(byte.class, ValueParser.of(Byte::parseByte))
-            .put(Byte.class, ValueParser.of(Byte::parseByte))
-            .put(boolean.class, ValueParser.of(Boolean::parseBoolean))
-            .put(Boolean.class, ValueParser.of(Boolean::parseBoolean))
-            .put(double.class, ValueParser.of(Double::parseDouble))
-            .put(Double.class, ValueParser.of(Double::parseDouble))
-            .put(float.class, ValueParser.of(Float::parseFloat))
-            .put(Float.class, ValueParser.of(Float::parseFloat))
-            .put(int.class, ValueParser.of(Integer::parseInt))
-            .put(Integer.class, ValueParser.of(Integer::parseInt))
-            .put(long.class, ValueParser.of(Long::parseLong))
-            .put(Long.class, ValueParser.of(Long::parseLong))
-            .put(short.class, ValueParser.of(Short::parseShort))
-            .put(Short.class, ValueParser.of(Short::parseShort))
-            .put(String.class, Input::next)
+            .put(byte.class, Byte::parseByte)
+            .put(Byte.class, Byte::parseByte)
+            .put(boolean.class, Boolean::parseBoolean)
+            .put(Boolean.class, Boolean::parseBoolean)
+            .put(double.class, Double::parseDouble)
+            .put(Double.class, Double::parseDouble)
+            .put(float.class, Float::parseFloat)
+            .put(Float.class, Float::parseFloat)
+            .put(int.class, Integer::parseInt)
+            .put(Integer.class, Integer::parseInt)
+            .put(long.class, Long::parseLong)
+            .put(Long.class, Long::parseLong)
+            .put(short.class, Short::parseShort)
+            .put(Short.class, Short::parseShort)
+            .put(String.class, s -> s)
             .build();
 
-    static <T> ValueParser<T> of(Function<String, T> function) {
-        return input -> function.apply(input.next());
-    }
-
     static ValueParser<String> joinedString(String separator) {
-        return input -> {
-            StringBuilder sb = new StringBuilder();
-            while (input.hasNext()) {
-                sb.append(sb.length() > 0 ? separator : "").append(input.next());
+        return new ValueParser<String>() {
+            @Override
+            public String parse(Input input) throws CommandException {
+                StringBuilder sb = new StringBuilder();
+                while (input.hasNext()) {
+                    sb.append(sb.length() > 0 ? separator : "").append(input.next());
+                }
+                return sb.toString();
             }
-            return sb.toString();
+
+            @Override
+            public String parse(String input) throws CommandException {
+                return input;
+            }
         };
     }
 
     static ValueParser<Object> node(Collection<String> options) {
-        return input -> {
-            String next = input.next();
+        return next -> {
             for (String option : options) {
                 if (option.equalsIgnoreCase(next)) {
                     return null;
                 }
             }
             throw new CommandException("Invalid arg '%s'", next);
+        };
+    }
+
+    static ValueParser<Object> enumParser(Class<? extends Enum> c) {
+        return input -> {
+            try {
+                input = input.toUpperCase();
+                return Enum.valueOf(c, input);
+            } catch (IllegalArgumentException e) {
+                throw new CommandException("Invalid enum value '%s'", input);
+            }
         };
     }
 }

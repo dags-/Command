@@ -1,5 +1,6 @@
 package me.dags.command.element;
 
+import me.dags.command.annotation.processor.Param;
 import me.dags.command.command.CommandException;
 import me.dags.command.command.Context;
 import me.dags.command.command.Input;
@@ -18,6 +19,11 @@ public class VarargElement implements Element {
     public VarargElement(Element element, Set<String> flags) {
         this.element = element;
         this.flags = flags;
+    }
+
+    @Override
+    public int getPriority() {
+        return Param.Type.VARARG.priority();
     }
 
     @Override

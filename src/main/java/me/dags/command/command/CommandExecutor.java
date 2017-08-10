@@ -7,18 +7,36 @@ import me.dags.command.annotation.processor.Param;
 import me.dags.command.element.Element;
 
 import java.lang.reflect.Method;
+import java.util.Comparator;
 import java.util.List;
 
 /**
  * @author dags <dags@dags.me>
  */
-public class CommandExecutor implements Comparable<CommandExecutor> {
+public class CommandExecutor {
+
+    public static final Comparator<CommandExecutor> EXECUTION_ORDER = (e1, e2) -> {
+        for (int i = 0, j = 0; i < e1.elements.size() && j < e2.elements.size(); i++, j++) {
+            Element el1 = e1.elements.get(i);
+            Element el2 = e2.elements.get(j);
+
+            int comp = Integer.compare(el1.getPriority(), el2.getPriority());
+            if (comp != 0) {
+                return comp;
+            }
+        }
+
+        return Integer.compare(e1.elements.size(), e2.elements.size());
+    };
+
+    public static final Comparator<CommandExecutor> ALPHABETICAL_ORDER = (e1, e2) -> e1.getUsage().value().compareTo(e2.getUsage().value());
 
     private final Object object;
     private final Method method;
     private final List<Param> params;
     private final List<Element> elements;
 
+    private final String args;
     private final Usage usage;
     private final Permission permission;
     private final Description description;
@@ -31,6 +49,10 @@ public class CommandExecutor implements Comparable<CommandExecutor> {
         usage = builder.usage;
         permission = builder.permission;
         description = builder.description;
+
+        String usage = getUsage().value();
+        int index = usage.indexOf(' ');
+        args = index > -1 && index < usage.length() ? usage.substring(index) : usage;
     }
 
     public Context parse(Object source, Input input) throws CommandException {
@@ -48,14 +70,14 @@ public class CommandExecutor implements Comparable<CommandExecutor> {
             try {
                 element.parse(input, context);
             } catch (CommandException e) {
-                throw e.priority(priority).usage(getUsage().value());
+                throw e.priority(priority).args(args);
             }
 
             priority++;
         }
 
         if (input.hasNext()) {
-            throw new CommandException("Too many args provided: '%s'", input.getRawInput()).priority(priority).usage(getUsage().value());
+            throw new CommandException("Too many args provided: '%s'", input.getRawInput()).priority(priority).args(args);
         }
 
         return context;
@@ -84,7 +106,7 @@ public class CommandExecutor implements Comparable<CommandExecutor> {
             Object val = context.get(param, param.getType());
 
             if (val == null) {
-                throw new CommandException("Parameter %s missing from Context", param.getId()).usage(getUsage().value());
+                throw new CommandException("Parameter %s missing from Context", param.getId()).args(this.args);
             }
 
             args[i] = val;
@@ -112,12 +134,6 @@ public class CommandExecutor implements Comparable<CommandExecutor> {
     @Override
     public String toString() {
         return getUsage().value();
-    }
-
-    @Override
-    public int compareTo(CommandExecutor executor) {
-        int result = Integer.compare(executor.elements.size(), elements.size());
-        return result != 0 ? result : executor.getUsage().value().compareTo(getUsage().value());
     }
 
     public static Builder builder() {

@@ -7,5 +7,9 @@ public enum TestEnum {
     MAYBE,
     THING,
     DONT,
-    KNOW
+    KNOW,
+    YELLOW,
+    KIKO,
+    MAMA,
+    YAYA
 }

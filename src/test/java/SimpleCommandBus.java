@@ -1,5 +1,6 @@
 import me.dags.command.CommandManager;
 import me.dags.command.command.Command;
+import me.dags.command.command.CommandExecutor;
 import me.dags.command.utils.MarkdownWriter;
 
 import java.io.IOException;
@@ -44,7 +45,7 @@ public class SimpleCommandBus extends CommandManager<Command<Object>> {
                     .distinct()
                     .map(Command::getExecutors)
                     .forEach(list -> list.stream()
-                            .sorted()
+                            .sorted(CommandExecutor.ALPHABETICAL_ORDER)
                             .forEach(writer::writeCommand)
                     );
         } catch (IOException e) {

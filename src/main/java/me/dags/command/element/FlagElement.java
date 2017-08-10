@@ -1,5 +1,6 @@
 package me.dags.command.element;
 
+import me.dags.command.annotation.processor.Param;
 import me.dags.command.command.CommandException;
 import me.dags.command.command.Context;
 import me.dags.command.command.Flags;
@@ -19,6 +20,11 @@ public class FlagElement implements Element {
     public FlagElement(String id, Map<String, Element> flags) {
         this.flags = flags;
         this.id = id;
+    }
+
+    @Override
+    public int getPriority() {
+        return Param.Type.FLAG.priority();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package me.dags.command.element;
 
+import me.dags.command.annotation.processor.Param;
 import me.dags.command.command.CommandException;
 import me.dags.command.command.Context;
 import me.dags.command.command.Input;
@@ -17,7 +18,7 @@ public class NodeElement extends ValueElement {
     private final String main;
 
     public NodeElement(String key, List<String> aliases) {
-        super(key, Options.of(aliases), Filter.STARTS_WITH, ValueParser.node(aliases));
+        super(key, Param.Type.NODE.priority(), Options.of(aliases), Filter.STARTS_WITH, ValueParser.node(aliases));
         this.main = aliases.get(0);
     }
 

@@ -57,7 +57,7 @@ public class Registrar<T extends Command<?>> {
 
     public Collection<T> build() {
         return builders.values().stream().distinct()
-                .peek(builder -> Collections.sort(builder.executors))
+                .peek(builder -> Collections.sort(builder.executors, CommandExecutor.EXECUTION_ORDER))
                 .map(builder -> getCommandFactory().create(builder.aliases, builder.executors))
                 .collect(Collectors.toList());
     }
