@@ -89,7 +89,7 @@ public class ValueElement implements Element {
     }
 
     @Override
-    public void suggest(Input input, List<String> suggestions) {
+    public void suggest(Input input, Context context, List<String> suggestions) {
         if (!input.hasNext()) {
             getOptions().get().sorted(SORTER).forEach(suggestions::add);
             return;

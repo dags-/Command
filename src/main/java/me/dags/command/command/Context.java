@@ -7,13 +7,26 @@ import me.dags.command.annotation.processor.Param;
 import me.dags.command.utils.ClassUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author dags <dags@dags.me>
  */
 public class Context {
 
+    private final Object source;
     private final LinkedListMultimap<String, Object> data = LinkedListMultimap.create();
+
+    Context(Object source) {
+        this.source = source;
+    }
+
+    public <T> Optional<T> getSource(Class<T> type) {
+        if (type.isInstance(source)) {
+            return Optional.of(type.cast(source));
+        }
+        return Optional.empty();
+    }
 
     public boolean add(String key, Object value) {
         return data.put(key, value);

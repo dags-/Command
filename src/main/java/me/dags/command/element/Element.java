@@ -13,7 +13,7 @@ public interface Element {
 
     void parse(Input input, Context context) throws CommandException;
 
-    void suggest(Input input, List<String> suggestions);
+    void suggest(Input input, Context context, List<String> suggestions);
 
     boolean test(Input input);
 
@@ -28,7 +28,7 @@ public interface Element {
         public void parse(Input input, Context context) throws CommandException {}
 
         @Override
-        public void suggest(Input input, List<String> suggestions) {}
+        public void suggest(Input input, Context context, List<String> suggestions) {}
 
         @Override
         public boolean test(Input input) {

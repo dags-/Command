@@ -16,6 +16,7 @@ import java.util.function.Function;
  */
 public class ElementFactory {
 
+    private final Map<Class<?>, ElementProvider> providers;
     private final Map<Class<?>, ValueParser<?>> parsers;
     private final Map<Class<?>, Options> options;
     private final Map<Class<?>, Filter> filters;
@@ -25,6 +26,7 @@ public class ElementFactory {
     private final ValueParser<?> defaultParser = ValueParser.EMPTY;
 
     protected ElementFactory(Builder builder) {
+        this.providers = ImmutableMap.copyOf(builder.providers);
         this.options = ImmutableMap.copyOf(builder.options);
         this.filters = ImmutableMap.copyOf(builder.filters);
         this.parsers = ImmutableMap.<Class<?>, ValueParser<?>>builder()
@@ -48,26 +50,18 @@ public class ElementFactory {
         }
 
         if (param.getParamType() == Param.Type.FLAG) {
-            return createFlagElement(param.getId(), param.getType(), options, filter, parser, flags);
+            return createFlagElement(param.getId(), priority, param.getType(), options, filter, parser, flags);
         }
 
         return createValueElement(param.getId(), priority, param.getType(), options, filter, parser);
     }
 
-    public final Element createValueElement(String id, Class<?> type, Options options, Filter filter, ValueParser parser) {
-        return createValueElement(id, Element.PRIORITY, type, options, filter, parser);
-    }
-
-    public final Element createVarargElement(String id, Class<?> type, Options options, Filter filter, ValueParser parser, Map<String, Element> flags) {
-        return createVarargElement(id, Param.Type.VARARG.priority(), type, options, filter, parser, flags);
-    }
-
-    public final Element createFlagElement(String id, Class<?> type, Options options, Filter filter, ValueParser parser, Map<String, Element> flags) {
-        return createFlagElement(id, Param.Type.FLAG.priority(), type, options, filter, parser, flags);
-    }
-
     public Element createValueElement(String id, int priority, Class<?> type, Options options, Filter filter, ValueParser parser) {
-        return new ValueElement(id, priority, options, filter, parser);
+        ElementProvider provider = providers.get(type);
+        if (provider == null) {
+            return new ValueElement(id, priority, options, filter, parser);
+        }
+        return provider.create(id, priority, options, filter, parser);
     }
 
     public Element createVarargElement(String id, int priority, Class<?> type, Options options, Filter filter, ValueParser parser, Map<String, Element> flags) {
@@ -140,25 +134,31 @@ public class ElementFactory {
 
     public static class Builder {
 
+        private final Map<Class<?>, ElementProvider> providers = new HashMap<>();
         private final Map<Class<?>, ValueParser<?>> parsers = new HashMap<>();
+        private final Map<Class<?>, Filter> filters = new HashMap<>();
         private final Map<Class<?>, Options> options = new HashMap<Class<?>, Options>(){{
             put(boolean.class, Options.of("false", "true"));
             put(Boolean.class, Options.of("false", "true"));
         }};
-        private final Map<Class<?>, Filter> filters = new HashMap<>();
 
         public <T> Builder parser(Class<T> type, ValueParser<T> parser) {
             parsers.put(type, parser);
             return this;
         }
 
-        public <T> Builder options(Class<T> type, Options options) {
+        public Builder options(Class<?> type, Options options) {
             this.options.put(type, options);
             return this;
         }
 
-        public <T> Builder filter(Class<T> type, Filter filter) {
+        public Builder filter(Class<?> type, Filter filter) {
             this.filters.put(type, filter);
+            return this;
+        }
+
+        public Builder provider(Class<?> type, ElementProvider provider) {
+            providers.put(type, provider);
             return this;
         }
 

@@ -25,7 +25,7 @@ public abstract class CommandManager<T extends Command<?>> {
     public CommandManager(Builder<T> builder) {
         this.owner = builder.owner;
         this.registrar = Registrar.of(builder.elementFactory, builder.commandFactory);
-        
+
     }
 
     public Object getOwner() {

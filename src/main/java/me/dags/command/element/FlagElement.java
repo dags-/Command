@@ -59,7 +59,7 @@ public class FlagElement implements Element {
     }
 
     @Override
-    public void suggest(Input input, List<String> suggestions) {
+    public void suggest(Input input, Context context, List<String> suggestions) {
         input.last().setPos(input.getPos() - 1);
 
         try {
@@ -70,7 +70,7 @@ public class FlagElement implements Element {
                 Element element = flags.getOrDefault(flag, Element.EMPTY);
 
                 if (element != Element.EMPTY) {
-                    element.suggest(input, suggestions);
+                    element.suggest(input, context, suggestions);
                     return;
                 }
             }

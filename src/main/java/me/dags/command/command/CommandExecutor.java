@@ -58,9 +58,12 @@ public class CommandExecutor {
     public Context parse(Object source, Input input) throws CommandException {
         input.reset();
 
-        Context context = new Context();
+        Context context = new Context(source);
         for (Param param : params) {
             if (param.getParamType() == Param.Type.SOURCE) {
+                if (!param.getType().isInstance(source)) {
+                    throw new CommandException("Command source must be of type %s", param.getType().getSimpleName());
+                }
                 context.add(param.getId(), source);
             }
         }
@@ -85,6 +88,7 @@ public class CommandExecutor {
 
     public void getSuggestions(Object source, Input input, List<String> suggestions) {
         input.reset();
+        Context context = new Context(source);
         for (Element element : elements) {
             if (!input.hasNext()) {
                 break;
@@ -94,7 +98,7 @@ public class CommandExecutor {
                 return;
             }
 
-            element.suggest(input, suggestions);
+            element.suggest(input, context, suggestions);
         }
     }
 
