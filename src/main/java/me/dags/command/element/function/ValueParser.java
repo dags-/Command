@@ -6,6 +6,7 @@ import me.dags.command.command.Input;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * @author dags <dags@dags.me>
@@ -22,20 +23,20 @@ public interface ValueParser<T> {
     ValueParser<?> EMPTY = input -> null;
 
     Map<Class<?>, ValueParser<?>> DEFAULTS = ImmutableMap.<Class<?>, ValueParser<?>>builder()
-            .put(byte.class, Byte::parseByte)
-            .put(Byte.class, Byte::parseByte)
+            .put(byte.class, ValueParser.of(Byte::parseByte))
+            .put(Byte.class, ValueParser.of(Byte::parseByte))
             .put(boolean.class, ValueParser.bool())
             .put(Boolean.class, ValueParser.bool())
-            .put(double.class, Double::parseDouble)
-            .put(Double.class, Double::parseDouble)
-            .put(float.class, Float::parseFloat)
-            .put(Float.class, Float::parseFloat)
-            .put(int.class, Integer::parseInt)
-            .put(Integer.class, Integer::parseInt)
-            .put(long.class, Long::parseLong)
-            .put(Long.class, Long::parseLong)
-            .put(short.class, Short::parseShort)
-            .put(Short.class, Short::parseShort)
+            .put(double.class, ValueParser.of(Double::parseDouble))
+            .put(Double.class, ValueParser.of(Double::parseDouble))
+            .put(float.class, ValueParser.of(Float::parseFloat))
+            .put(Float.class, ValueParser.of(Float::parseFloat))
+            .put(int.class, ValueParser.of(Integer::parseInt))
+            .put(Integer.class, ValueParser.of(Integer::parseInt))
+            .put(long.class, ValueParser.of(Long::parseLong))
+            .put(Long.class, ValueParser.of(Long::parseLong))
+            .put(short.class, ValueParser.of(Short::parseShort))
+            .put(Short.class, ValueParser.of(Short::parseShort))
             .put(String.class, s -> s)
             .build();
 
@@ -85,6 +86,16 @@ public interface ValueParser<T> {
                 return Boolean.valueOf(input);
             }
             throw new CommandException("Invalid boolean value '%s", input);
+        };
+    }
+
+    static <T> ValueParser<T> of(Function<String, T> func) {
+        return input -> {
+            try {
+                return func.apply(input);
+            } catch (Throwable e) {
+                throw new CommandException(e.getMessage());
+            }
         };
     }
 }
