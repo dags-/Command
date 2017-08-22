@@ -16,10 +16,6 @@ import java.util.Optional;
 public class Main extends JFrame implements KeyListener {
 
     public static void main(String[] args) {
-        for (Enum e : TestEnum.class.getEnumConstants()) {
-            System.out.println(e.name());
-        }
-
         new Main();
     }
 

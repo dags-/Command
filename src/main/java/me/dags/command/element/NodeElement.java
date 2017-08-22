@@ -29,6 +29,6 @@ public class NodeElement extends ValueElement {
 
     @Override
     public String toString() {
-        return main;
+        return "Node: " + main;
     }
 }

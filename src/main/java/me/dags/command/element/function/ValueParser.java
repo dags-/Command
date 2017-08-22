@@ -24,8 +24,8 @@ public interface ValueParser<T> {
     Map<Class<?>, ValueParser<?>> DEFAULTS = ImmutableMap.<Class<?>, ValueParser<?>>builder()
             .put(byte.class, Byte::parseByte)
             .put(Byte.class, Byte::parseByte)
-            .put(boolean.class, Boolean::parseBoolean)
-            .put(Boolean.class, Boolean::parseBoolean)
+            .put(boolean.class, ValueParser.bool())
+            .put(Boolean.class, ValueParser.bool())
             .put(double.class, Double::parseDouble)
             .put(Double.class, Double::parseDouble)
             .put(float.class, Float::parseFloat)
@@ -76,6 +76,15 @@ public interface ValueParser<T> {
             } catch (IllegalArgumentException e) {
                 throw new CommandException("Invalid enum value '%s'", input);
             }
+        };
+    }
+
+    static ValueParser<Boolean> bool() {
+        return input -> {
+            if (input.equalsIgnoreCase("true") || input.equalsIgnoreCase("false")) {
+                return Boolean.valueOf(input);
+            }
+            throw new CommandException("Invalid boolean value '%s", input);
         };
     }
 }

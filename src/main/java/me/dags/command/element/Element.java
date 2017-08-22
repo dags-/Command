@@ -15,8 +15,6 @@ public interface Element {
 
     void suggest(Input input, Context context, List<String> suggestions);
 
-    boolean test(Input input);
-
     default int getPriority() {
         return PRIORITY;
     }
@@ -29,10 +27,5 @@ public interface Element {
 
         @Override
         public void suggest(Input input, Context context, List<String> suggestions) {}
-
-        @Override
-        public boolean test(Input input) {
-            return false;
-        }
     };
 }

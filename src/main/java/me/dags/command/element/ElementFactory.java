@@ -45,6 +45,10 @@ public class ElementFactory {
             throw new UnsupportedOperationException("Invalid element type " + param.getType());
         }
 
+        if (param.getParamType() == Param.Type.ANY) {
+            return createMultiValueElement(param.getId(), priority, param.getType(), options, filter, parser);
+        }
+
         if (param.getParamType() == Param.Type.VARARG) {
             return createVarargElement(param.getId(), priority, param.getType(), options, filter, parser, flags);
         }
@@ -56,20 +60,40 @@ public class ElementFactory {
         return createValueElement(param.getId(), priority, param.getType(), options, filter, parser);
     }
 
+    public final Element createValueElement(String id, int priority, Options options, Filter filter, ValueParser parser) {
+        return new ValueElement(id, priority, options, filter, parser);
+    }
+
+    public final Element createMultiValueElement(String id, int priority, Options options, Filter filter, ValueParser parser) {
+        return new MultiValueElement(id, priority, options, filter, parser);
+    }
+
+    public final Element createVarargElement(Element element, Map<String, Element> flags) {
+        return new VarargElement(element, flags.keySet());
+    }
+
+    public final Element createFlagElement(String id, Map<String, Element> flags) {
+        return new FlagElement(id, flags);
+    }
+
     public Element createValueElement(String id, int priority, Class<?> type, Options options, Filter filter, ValueParser parser) {
         ElementProvider provider = providers.get(type);
         if (provider == null) {
-            return new ValueElement(id, priority, options, filter, parser);
+            return createValueElement(id, priority, options, filter, parser);
         }
         return provider.create(id, priority, options, filter, parser);
     }
 
+    public Element createMultiValueElement(String id, int priority, Class<?> type, Options options, Filter filter, ValueParser parser) {
+        return createMultiValueElement(id, priority, options, filter, parser);
+    }
+
     public Element createVarargElement(String id, int priority, Class<?> type, Options options, Filter filter, ValueParser parser, Map<String, Element> flags) {
-        return new VarargElement(createValueElement(id, priority, type, options, filter, parser), flags.keySet());
+        return createVarargElement(createValueElement(id, priority, type, options, filter, parser), flags);
     }
 
     public Element createFlagElement(String id, int priority, Class<?> type, Options options, Filter filter, ValueParser parser, Map<String, Element> flags) {
-        return new FlagElement(id, flags);
+        return createFlagElement(id, flags);
     }
 
     public Options getOptions(Param param) {

@@ -1,5 +1,7 @@
-import me.dags.command.annotation.*;
-import me.dags.command.command.Flags;
+import me.dags.command.annotation.Command;
+import me.dags.command.annotation.Description;
+import me.dags.command.annotation.Permission;
+import me.dags.command.annotation.Role;
 
 import java.util.Collection;
 
@@ -21,18 +23,16 @@ public class TestCommands {
         System.out.printf("PromoteA user: %s", user);
     }
 
-    @Flag("t")
-    @Flag(value = "p", type = TestEnum.class)
     @Permission
-    @Command("user promote <user>")
-    public void twoB(String user, Flags flags) {
-        System.out.printf("PromoteB user: %s, bool flag: %s, int flag: %s", user, flags.getOr("t", false), flags.getOr("p", TestEnum.NO));
+    @Command("test <user> set <num>")
+    public void twoB(String user, Collection<TestEnum> num) {
+        System.out.printf("PromoteB user: %s, Enum flag: %s\n", user, num);
     }
 
     @Permission(role = @Role("admin"))
-    @Command("user demote <user>")
+    @Command("user num <num>")
     @Description("Demote a user")
-    public void three(String user, Collection<TestEnum> examples) {
-        System.out.printf("User: %s, Enum: %s\n", user, examples);
+    public void three(TestEnum num) {
+        System.out.printf("Num: %s\n", num);
     }
 }

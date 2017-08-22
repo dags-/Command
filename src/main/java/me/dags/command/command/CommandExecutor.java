@@ -94,11 +94,14 @@ public class CommandExecutor {
                 break;
             }
 
-            if (!element.test(input)) {
-                return;
-            }
+            int pos = input.getPos();
 
-            element.suggest(input, context, suggestions);
+            try {
+                element.parse(input, context);
+            } catch (CommandException e) {
+                input.setPos(pos);
+                element.suggest(input, context, suggestions);
+            }
         }
     }
 

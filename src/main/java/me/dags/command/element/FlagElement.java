@@ -23,6 +23,11 @@ public class FlagElement implements Element {
     }
 
     @Override
+    public String toString() {
+        return "Flags: " + id;
+    }
+
+    @Override
     public int getPriority() {
         return Param.Type.FLAG.priority();
     }
@@ -80,10 +85,5 @@ public class FlagElement implements Element {
         } catch (CommandException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public boolean test(Input input) {
-        return true;
     }
 }

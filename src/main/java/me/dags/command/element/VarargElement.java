@@ -22,6 +22,11 @@ public class VarargElement implements Element {
     }
 
     @Override
+    public String toString() {
+        return "Vararg: [" + element.toString() + "]";
+    }
+
+    @Override
     public int getPriority() {
         return Param.Type.VARARG.priority();
     }
@@ -41,10 +46,5 @@ public class VarargElement implements Element {
         while (input.hasNext()) {
             element.suggest(input, context, suggestions);
         }
-    }
-
-    @Override
-    public boolean test(Input input) {
-        return element.test(input);
     }
 }

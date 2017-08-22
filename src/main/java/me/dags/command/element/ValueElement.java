@@ -7,22 +7,13 @@ import me.dags.command.element.function.Filter;
 import me.dags.command.element.function.Options;
 import me.dags.command.element.function.ValueParser;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author dags <dags@dags.me>
  */
 public class ValueElement implements Element {
-
-    private static final Comparator<String> SORTER = (s1, s2) -> {
-        if (s1.length() != s2.length()) {
-            return Integer.compare(s1.length(), s2.length());
-        }
-        return s1.compareTo(s2);
-    };
 
     private final String key;
     private final int priority;
@@ -30,12 +21,17 @@ public class ValueElement implements Element {
     private final Options options;
     private final ValueParser<?> parser;
 
-    ValueElement(String key, int priority, Options options, Filter filter, ValueParser<?> parser) {
+    public ValueElement(String key, int priority, Options options, Filter filter, ValueParser<?> parser) {
         this.key = key;
         this.priority = priority;
         this.filter = filter;
         this.options = options;
         this.parser = parser;
+    }
+
+    @Override
+    public String toString() {
+        return "Value: " + key;
     }
 
     @Override
@@ -45,59 +41,20 @@ public class ValueElement implements Element {
 
     @Override
     public void parse(Input input, Context context) throws CommandException {
-        if (getOptions() == Options.EMPTY) {
-            Object value = parser.parse(input);
-            context.add(key, value);
-            return;
-        }
-
-        String next = input.next();
-        List<String> matches = options.get().filter(s -> filter.test(s, next)).collect(Collectors.toList());
-        List<Object> results = new ArrayList<>(matches.size());
-
-        CommandException last = null;
-
-        for (String match : matches) {
-            try {
-                Object val = parser.parse(match);
-
-                // ignore successfully parsed but null values
-                if (val == null) {
-                    continue;
-                }
-
-                // only return one if exact match
-                if (next.equalsIgnoreCase(match)) {
-                    context.add(getKey(), val);
-                    return;
-                }
-
-                // collect non-exact matches
-                results.add(val);
-            } catch (CommandException e) {
-                last = e;
-            }
-        }
-
-        if (results.isEmpty() && last != null) {
-            throw last;
-        }
-
-        for (Object val : results) {
-            context.add(getKey(), val);
-        }
+        Object value = parser.parse(input);
+        context.add(getKey(), value);
     }
 
     @Override
     public void suggest(Input input, Context context, List<String> suggestions) {
         if (!input.hasNext()) {
-            getOptions().get().sorted(SORTER).forEach(suggestions::add);
+            getOptions().get().sorted().forEach(suggestions::add);
             return;
         }
 
         try {
             String next = input.next();
-            if (options == Options.EMPTY) {
+            if (getOptions() == Options.EMPTY) {
                 return;
             }
 
@@ -105,24 +62,11 @@ public class ValueElement implements Element {
                 return;
             }
 
-            getOptions().get().filter(s -> filter.test(s, next)).sorted(SORTER).forEach(suggestions::add);
+            Comparator<String> sorter = sorter(next.toLowerCase());
+            getOptions().get().filter(s -> getFilter().test(s, next)).sorted(sorter).forEach(suggestions::add);
         } catch (CommandException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public boolean test(Input input) {
-        if (input.hasNext()) {
-            if (options == Options.EMPTY) {
-                return true;
-            }
-
-            String next = input.peek();
-
-            return getOptions().get().anyMatch(s -> getFilter().test(s, next));
-        }
-        return false;
     }
 
     public String getKey() {
@@ -139,5 +83,21 @@ public class ValueElement implements Element {
 
     public Filter getFilter() {
         return filter;
+    }
+
+    protected Comparator<String> sorter(String match) {
+        return (s1, s2) -> {
+            int i1 = s1.toLowerCase().indexOf(match);
+            int i2 = s2.toLowerCase().indexOf(match);
+
+            if (i1 == i2) {
+                i1 = s1.length();
+                i2 = s2.length();
+                if (i1 == i2) {
+                    return s1.compareTo(s2);
+                }
+            }
+            return Integer.compare(i1, i2);
+        };
     }
 }
