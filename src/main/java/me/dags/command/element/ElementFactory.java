@@ -60,6 +60,18 @@ public class ElementFactory {
         return createValueElement(param.getId(), priority, param.getType(), options, filter, parser);
     }
 
+    public final boolean hasParser(Class<?> type) {
+        return parsers.containsKey(type);
+    }
+
+    public final boolean hasOptions(Class<?> type) {
+        return options.containsKey(type);
+    }
+
+    public final boolean hasFilter(Class<?> type) {
+        return filters.containsKey(type);
+    }
+
     public final Element createValueElement(String id, int priority, Options options, Filter filter, ValueParser parser) {
         return new ValueElement(id, priority, options, filter, parser);
     }

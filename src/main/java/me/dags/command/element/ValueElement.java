@@ -62,7 +62,7 @@ public class ValueElement implements Element {
                 return;
             }
 
-            Comparator<String> sorter = sorter(next.toLowerCase());
+            Comparator<String> sorter = sorter(next);
             getOptions().get().filter(s -> getFilter().test(s, next)).sorted(sorter).forEach(suggestions::add);
         } catch (CommandException e) {
             e.printStackTrace();
@@ -85,7 +85,8 @@ public class ValueElement implements Element {
         return filter;
     }
 
-    protected Comparator<String> sorter(String match) {
+    protected Comparator<String> sorter(String input) {
+        String match = input.toLowerCase();
         return (s1, s2) -> {
             int i1 = s1.toLowerCase().indexOf(match);
             int i2 = s2.toLowerCase().indexOf(match);
