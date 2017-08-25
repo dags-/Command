@@ -1,0 +1,133 @@
+package me.dags.command.element;
+
+import me.dags.command.command.CommandException;
+import me.dags.command.command.Context;
+import me.dags.command.command.Input;
+import me.dags.command.element.function.ChainOptions;
+import me.dags.command.element.function.ChainParser;
+import me.dags.command.element.function.Filter;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * @author dags <dags@dags.me>
+ */
+public class ChainElement<D, T> implements Element {
+
+    private final String key;
+    private final Class<D> dependency;
+    private final ChainParser<D, T> mapper;
+    private final ChainOptions<D> options;
+    private final Filter filter;
+
+    private ChainElement(Builder<D, T> builder) {
+        key = builder.key;
+        dependency = builder.dependency;
+        mapper = builder.mapper;
+        options = builder.options;
+        filter = builder.filter;
+    }
+
+    @Override
+    public void parse(Input input, Context context) throws CommandException {
+        D d = context.getLast(dependency.getCanonicalName());
+        if (d == null) {
+            throw new CommandException("No %s present", dependency.getSimpleName());
+        }
+
+        T t = mapper.map(input, d);
+        if (t == null) {
+            throw new CommandException("Unable to parse a value for %s", d);
+        }
+
+        context.add(key, t);
+    }
+
+    @Override
+    public void suggest(Input input, Context context, List<String> suggestions) {
+        if(!input.hasNext()) {
+            Collection<String> options = getOptions(context);
+            suggestions.addAll(options);
+        } else {
+            try {
+                String e = input.next();
+                Collection<String> options = getOptions(context);
+                if(options.isEmpty()) {
+                    return;
+                }
+
+                if (options.stream().anyMatch(s -> s.equalsIgnoreCase(e))) {
+                    return;
+                }
+
+                String upper = e.toUpperCase();
+                for (String option : options) {
+                    if (getFilter().test(option, upper)) {
+                        suggestions.add(option);
+                    }
+                }
+            } catch (CommandException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public Filter getFilter() {
+        return filter;
+    }
+
+    public Collection<String> getOptions(Context context) {
+        D d = context.getLast(dependency.getCanonicalName());
+
+        if (d == null) {
+            return Collections.emptyList();
+        }
+
+        return options.get(d).collect(Collectors.toList());
+    }
+
+    public static <D, T> Builder<D, T> builder() {
+        return new Builder<>();
+    }
+
+    public static class Builder<D, T> {
+
+        private String key;
+        private Class<D> dependency;
+        private ChainParser<D, T> mapper;
+        private ChainOptions<D> options;
+        private Filter filter;
+
+        public Builder<D, T> key(String key) {
+            this.key = key;
+            return this;
+        }
+
+        public Builder<D, T> dependency(Class<D> dependency) {
+            this.dependency = dependency;
+            return this;
+        }
+
+        public Builder<D, T> mapper(ChainParser<D, T> mapper) {
+            this.mapper = mapper;
+            return this;
+        }
+
+        public Builder<D, T> options(ChainOptions<D> options) {
+            this.options = options;
+            return this;
+        }
+
+        public Builder<D, T> key(Filter filter) {
+            this.filter = filter;
+            return this;
+        }
+
+        public ChainElement<D, T> build() {
+            return new ChainElement<>(this);
+        }
+    }
+}

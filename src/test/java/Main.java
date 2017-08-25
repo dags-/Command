@@ -1,5 +1,10 @@
 import me.dags.command.command.Command;
 import me.dags.command.command.Input;
+import me.dags.command.element.ChainElement;
+import me.dags.command.element.ElementFactory;
+import me.dags.command.element.ElementProvider;
+import me.dags.command.element.function.Filter;
+import me.dags.command.element.function.ValueParser;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,6 +14,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * @author dags <dags@dags.me>
@@ -20,12 +26,31 @@ public class Main extends JFrame implements KeyListener {
     }
 
     private final JTextField input = new JTextField();
-    private final SimpleCommandBus bus = SimpleCommandBus.create();
+    private final SimpleCommandBus bus;
 
     private int suggestion = 0;
     private List<String> suggestions = new LinkedList<>();
 
+    private static ElementProvider dependent() {
+        return (id, priority, options, filter, parser) -> ChainElement.<TestEnum, String>builder()
+                .dependency(TestEnum.class)
+                .key(id)
+                .key(Filter.CONTAINS)
+                .options(num -> Stream.of("1", "2", "3"))
+                .mapper((input, num) -> num.name().toLowerCase() + "_" + ValueParser.get(int.class).parse(input))
+                .build();
+    }
+
     private Main() {
+        ElementFactory factory = ElementFactory.builder()
+                .provider(Object.class, dependent())
+                .build();
+
+        bus = SimpleCommandBus.<Command<Object>>builder()
+                .elements(factory)
+                .commands(Command::new)
+                .build(SimpleCommandBus::new);
+
         bus.register(new TestCommands()).submit();
 
         System.out.println(bus.getDocumentation());

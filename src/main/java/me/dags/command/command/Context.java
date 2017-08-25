@@ -29,7 +29,9 @@ public class Context {
     }
 
     public boolean add(String key, Object value) {
-        return data.put(key, value);
+        boolean result = data.put(key, value);
+        data.put(value.getClass().getCanonicalName(), value);
+        return result;
     }
 
     @SuppressWarnings("unchecked")
@@ -59,6 +61,16 @@ public class Context {
 
         if (list.size() > 0) {
             return list.get(0);
+        }
+
+        return null;
+    }
+
+    public <T> T getLast(String key) {
+        List<T> list = get(key);
+
+        if (list.size() > 0) {
+            return list.get(list.size() - 1);
         }
 
         return null;

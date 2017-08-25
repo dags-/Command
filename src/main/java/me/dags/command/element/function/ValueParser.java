@@ -40,6 +40,10 @@ public interface ValueParser<T> {
             .put(String.class, s -> s)
             .build();
 
+    static ValueParser<?> get(Class<?> c) {
+        return DEFAULTS.getOrDefault(c, EMPTY);
+    }
+
     static ValueParser<String> joinedString(String separator) {
         return new ValueParser<String>() {
             @Override

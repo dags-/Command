@@ -3,8 +3,6 @@ import me.dags.command.annotation.Description;
 import me.dags.command.annotation.Permission;
 import me.dags.command.annotation.Role;
 
-import java.util.Collection;
-
 /**
  * @author dags <dags@dags.me>
  */
@@ -24,8 +22,8 @@ public class TestCommands {
     }
 
     @Permission
-    @Command("test <user> set <num>")
-    public void twoB(String user, Collection<TestEnum> num) {
+    @Command("test <num> set <name>")
+    public void twoB(TestEnum num, Object user) {
         System.out.printf("PromoteB user: %s, Enum flag: %s\n", user, num);
     }
 
