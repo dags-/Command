@@ -25,29 +25,56 @@ public class MultiValueElement implements Element {
 
     @Override
     public void parse(Input input, Context context) throws CommandException {
+        if (suggest(input, context)) {
+            return;
+        }
+
         List<String> suggestions = new LinkedList<>();
         LinkedList<CommandException> exceptions = new LinkedList<>();
 
+        int startPos = input.getPos();
+        int endPos = startPos;
         suggest(input, context, suggestions);
 
-        boolean success = false;
+        if (suggestions.isEmpty()) {
+            input.setPos(startPos);
+            suggestions.add(input.next());
+        }
+
         for (String suggestion : suggestions) {
             try {
+                input.setPos(startPos);
                 Input next = input.replace(suggestion);
                 element.parse(next, context);
-                success = true;
+                endPos = next.getPos();
             } catch (CommandException e) {
                 exceptions.add(e);
             }
         }
 
-        if (!success && !exceptions.isEmpty()) {
+        if (startPos == endPos && !exceptions.isEmpty()) {
             throw exceptions.getLast();
         }
+
+        input.setPos(endPos);
     }
 
     @Override
     public void suggest(Input input, Context context, List<String> suggestions) {
         element.suggest(input, context, suggestions);
+    }
+
+    private boolean suggest(Input input, Context context) throws CommandException {
+        if (context.has("#suggest")) {
+            try {
+                element.parse(input, context);
+            } catch (CommandException e) {
+                if (!input.hasNext()) {
+                    throw e;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 }

@@ -37,8 +37,9 @@ public class TestCommands {
     }
 
     @Command("all thing <nums> <num>")
-    public void match(Collection<TestEnum> nums, int num) {
+    public void match(Collection<TestEnum> nums, TestEnum num) {
+        System.out.println("-------------");
         nums.forEach(System.out::println);
-        System.out.println(num);
+        System.out.println("## " + num);
     }
 }

@@ -89,6 +89,8 @@ public class CommandExecutor {
     public void getSuggestions(Object source, Input input, List<String> suggestions) {
         input.reset();
         Context context = new Context(source);
+        context.add("#suggest", true);
+
         for (Element element : elements) {
             if (!input.hasNext()) {
                 break;

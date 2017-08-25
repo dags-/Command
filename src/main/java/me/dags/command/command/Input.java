@@ -23,7 +23,7 @@ public class Input {
         return pos + 1 < args.size();
     }
 
-    private String current() {
+    public String current() {
         return args.get(Math.min(args.size() - 1, Math.max(0, pos)));
     }
 
