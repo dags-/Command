@@ -23,7 +23,7 @@ public class ChainElement<D, T> implements Element {
     private final ChainOptions<D> options;
     private final Filter filter;
 
-    private ChainElement(Builder<D, T> builder) {
+    protected ChainElement(Builder<D, T> builder) {
         key = builder.key;
         dependency = builder.dependency;
         mapper = builder.mapper;
@@ -121,7 +121,7 @@ public class ChainElement<D, T> implements Element {
             return this;
         }
 
-        public Builder<D, T> key(Filter filter) {
+        public Builder<D, T> filter(Filter filter) {
             this.filter = filter;
             return this;
         }

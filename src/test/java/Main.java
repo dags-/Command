@@ -35,7 +35,7 @@ public class Main extends JFrame implements KeyListener {
         return (id, priority, options, filter, parser) -> ChainElement.<TestEnum, String>builder()
                 .dependency(TestEnum.class)
                 .key(id)
-                .key(Filter.CONTAINS)
+                .filter(Filter.CONTAINS)
                 .options(num -> Stream.of("1", "2", "3"))
                 .mapper((input, num) -> num.name().toLowerCase() + "_" + ValueParser.get(int.class).parse(input))
                 .build();
