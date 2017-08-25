@@ -23,6 +23,10 @@ public class Input {
         return pos + 1 < args.size();
     }
 
+    private String current() {
+        return args.get(Math.min(args.size() - 1, Math.max(0, pos)));
+    }
+
     public String peek() {
         return args.get(pos + 1);
     }
@@ -41,6 +45,14 @@ public class Input {
     public Input slice(int start, int end) {
         String s = rawInput.substring(start, end);
         return new Input(s);
+    }
+
+    public Input replace(String replacement) {
+        String find = hasNext() ? peek() : current();
+        int pos = getCursor();
+        String start = rawInput.substring(0, pos);
+        String end = rawInput.substring(pos).replace(find, replacement);
+        return new Input(start + end);
     }
 
     public int getPos() {

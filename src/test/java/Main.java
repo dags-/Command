@@ -22,6 +22,11 @@ import java.util.stream.Stream;
 public class Main extends JFrame implements KeyListener {
 
     public static void main(String[] args) {
+        Input input = new Input("this is the command inp");
+        input = input.replace("that");
+        System.out.println(input.getRawInput());
+
+
         new Main();
     }
 

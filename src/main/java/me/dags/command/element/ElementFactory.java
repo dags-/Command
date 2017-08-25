@@ -76,8 +76,8 @@ public class ElementFactory {
         return new ValueElement(id, priority, options, filter, parser);
     }
 
-    public final Element createMultiValueElement(String id, int priority, Options options, Filter filter, ValueParser parser) {
-        return new MultiValueElement(id, priority, options, filter, parser);
+    public final Element createMultiValueElement(Element element) {
+        return new MultiValueElement(element);
     }
 
     public final Element createVarargElement(Element element, Map<String, Element> flags) {
@@ -97,7 +97,7 @@ public class ElementFactory {
     }
 
     public Element createMultiValueElement(String id, int priority, Class<?> type, Options options, Filter filter, ValueParser parser) {
-        return createMultiValueElement(id, priority, options, filter, parser);
+        return createMultiValueElement(createValueElement(id, priority, type, options, filter, parser));
     }
 
     public Element createVarargElement(String id, int priority, Class<?> type, Options options, Filter filter, ValueParser parser, Map<String, Element> flags) {
