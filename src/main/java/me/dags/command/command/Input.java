@@ -49,10 +49,12 @@ public class Input {
 
     public Input replace(String replacement) {
         String find = hasNext() ? peek() : current();
-        int pos = getCursor();
-        String start = rawInput.substring(0, pos);
-        String end = rawInput.substring(pos).replace(find, replacement);
-        return new Input(start + end);
+        int cursor = getCursor();
+        String start = rawInput.substring(0, cursor);
+        String end = rawInput.substring(cursor).replace(find, replacement);
+        Input input = new Input(start + end);
+        input.setPos(pos);
+        return input;
     }
 
     public int getPos() {

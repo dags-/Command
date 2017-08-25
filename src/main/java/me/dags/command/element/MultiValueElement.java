@@ -33,7 +33,8 @@ public class MultiValueElement implements Element {
         boolean success = false;
         for (String suggestion : suggestions) {
             try {
-                element.parse(input.replace(suggestion), context);
+                Input next = input.replace(suggestion);
+                element.parse(next, context);
                 success = true;
             } catch (CommandException e) {
                 exceptions.add(e);
