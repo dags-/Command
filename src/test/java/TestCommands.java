@@ -1,7 +1,4 @@
-import me.dags.command.annotation.Command;
-import me.dags.command.annotation.Description;
-import me.dags.command.annotation.Permission;
-import me.dags.command.annotation.Role;
+import me.dags.command.annotation.*;
 
 import java.util.Collection;
 
@@ -19,8 +16,8 @@ public class TestCommands {
 
     @Permission
     @Command("print")
-    public void twoA() {
-        System.out.printf("This command is working?\n");
+    public void twoA(@Src Object source) {
+        System.out.printf("This command is working? @%s\n", source);
     }
 
     @Permission

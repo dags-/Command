@@ -17,8 +17,8 @@ public class Command<T> {
         this.aliases = ImmutableList.copyOf(aliases);
     }
 
-    public void processCommand(T source, String rawInput) throws CommandException {
-        Input input = new Input(rawInput);
+    public void processArguments(T source, String arguments) throws CommandException {
+        Input input = new Input(arguments);
         List<CommandException> exceptions = new ArrayList<>(executors.size());
 
         for (CommandExecutor executor : executors) {

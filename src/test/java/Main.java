@@ -1,4 +1,3 @@
-import me.dags.command.command.Command;
 import me.dags.command.command.Input;
 import me.dags.command.element.ChainElement;
 import me.dags.command.element.ElementFactory;
@@ -116,9 +115,9 @@ public class Main extends JFrame implements KeyListener {
     private void submit(String raw) {
         try {
             Input input = new Input(raw);
-            Optional<Command<?>> command = bus.getCommand(input.next());
+            Optional<SimpleCommand> command = bus.getCommand(input.peek());
             if (command.isPresent()) {
-                command.get().processCommand(null, input.trimFirstToken().getRawInput());
+                command.get().processArguments("TheSource", input.trimFirstToken().getRawInput());
             } else {
                 System.out.println("Command not found!");
             }
@@ -130,9 +129,9 @@ public class Main extends JFrame implements KeyListener {
     private void suggest(String raw) {
         try {
             Input input = new Input(raw);
-            Optional<Command<?>> command = bus.getCommand(input.next());
+            Optional<SimpleCommand> command = bus.getCommand(input.peek());
             if (command.isPresent()) {
-                suggestions = command.get().suggestCommand(null, input.trimFirstToken().getRawInput());
+                suggestions = command.get().suggestCommand("TheSource", input.trimFirstToken().getRawInput());
                 System.out.println(suggestions);
             } else {
                 System.out.println("Command not found!");

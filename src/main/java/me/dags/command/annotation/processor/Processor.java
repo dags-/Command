@@ -15,10 +15,7 @@ import me.dags.command.utils.IDGenerator;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author dags <dags@dags.me>
@@ -41,9 +38,9 @@ public class Processor {
                     continue;
                 }
 
-                List<Token> tokens = new Tokenizer(command.value()).parse();
+                LinkedList<Token> tokens = new Tokenizer(command.value()).parse();
                 if (tokens.size() > 0) {
-                    Token root = tokens.get(0);
+                    Token root = tokens.pollFirst();
                     CommandExecutor executor = processMethod(o, method, tokens);
                     registrar.register(root.getAliases(), executor);
                     count++;
@@ -54,7 +51,7 @@ public class Processor {
         return count;
     }
 
-    private CommandExecutor processMethod(Object object, Method method, List<Token> tokens) {
+    private CommandExecutor processMethod(Object object, Method method, LinkedList<Token> tokens) {
         Usage usage = getUsage(method, tokens);
         Permission permission = getPermission(method, tokens);
         Description description = getDescription(method);
@@ -74,7 +71,7 @@ public class Processor {
                 .build();
     }
 
-    private void processParameters(Method m, List<Token> tokens, List<Param> params, List<Element> elements) {
+    private void processParameters(Method m, LinkedList<Token> tokens, List<Param> params, List<Element> elements) {
         Map<String, Element> flags = buildFlags(m.getAnnotationsByType(Flag.class));
 
         IDGenerator generator = new IDGenerator();
@@ -85,9 +82,9 @@ public class Processor {
             params.add(param);
         }
 
-        for (int p = 0, t = 0; p < params.size() || t < tokens.size(); t++) {
-            if (t < tokens.size()) {
-                Token token = tokens.get(t);
+        for (int p = 0; p < params.size() || !tokens.isEmpty();) {
+            if (!tokens.isEmpty()) {
+                Token token = tokens.pollFirst();
 
                 if (token.isNode()) {
                     String id = generator.getId(Object.class);
@@ -103,12 +100,12 @@ public class Processor {
                     param = params.get(p++);
                 } while (p < params.size() && param.getParamType() == Param.Type.SOURCE);
 
-                Element element = registrar.getElementFactory().create(param, flags);
-                elements.add(element);
+                if (param.getParamType() != Param.Type.SOURCE) {
+                    Element element = registrar.getElementFactory().create(param, flags);
+                    elements.add(element);
+                }
             }
         }
-
-        elements.remove(0);
     }
 
     private Map<String, Element> buildFlags(Flag[] flags) {

@@ -1,6 +1,5 @@
 package me.dags.command.annotation.processor;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,12 +15,12 @@ public class Tokenizer {
         this.input = input;
     }
 
-    public List<Token> parse() {
-        List<Token> elements = new LinkedList<>();
+    public LinkedList<Token> parse() {
+        LinkedList<Token> elements = new LinkedList<>();
         while (hasNext()) {
             elements.add(nextToken());
         }
-        return new ArrayList<>(elements);
+        return elements;
     }
 
     private boolean hasNext() {

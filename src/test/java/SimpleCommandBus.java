@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  */
 public class SimpleCommandBus extends CommandManager<SimpleCommand> {
 
-    private final Map<String, Command<?>> commands = new HashMap<>();
+    private final Map<String, SimpleCommand> commands = new HashMap<>();
 
     public SimpleCommandBus(Builder<SimpleCommand> builder) {
         super(builder);
@@ -53,7 +53,7 @@ public class SimpleCommandBus extends CommandManager<SimpleCommand> {
         }
     }
 
-    public Optional<Command<?>> getCommand(String alias) {
+    public Optional<SimpleCommand> getCommand(String alias) {
         return Optional.ofNullable(commands.get(alias));
     }
 
