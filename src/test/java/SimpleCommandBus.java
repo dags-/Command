@@ -10,16 +10,16 @@ import java.util.stream.Collectors;
 /**
  * @author dags <dags@dags.me>
  */
-public class SimpleCommandBus extends CommandManager<Command<Object>> {
+public class SimpleCommandBus extends CommandManager<SimpleCommand> {
 
     private final Map<String, Command<?>> commands = new HashMap<>();
 
-    public SimpleCommandBus(Builder<Command<Object>> builder) {
+    public SimpleCommandBus(Builder<SimpleCommand> builder) {
         super(builder);
     }
 
     @Override
-    protected void submit(Object owner, Command<Object> command) {
+    protected void submit(Object owner, SimpleCommand command) {
         for (String key : command.getAliases()) {
             commands.put(key, command);
         }
@@ -62,9 +62,9 @@ public class SimpleCommandBus extends CommandManager<Command<Object>> {
     }
 
     public static SimpleCommandBus create() {
-        return SimpleCommandBus.<Command<Object>>builder()
+        return SimpleCommandBus.<SimpleCommand>builder()
                 .owner(new Object())
-                .commands(Command::new)
+                .commands(SimpleCommand::new)
                 .build(SimpleCommandBus::new);
     }
 }

@@ -2,7 +2,7 @@ package me.dags.command.command;
 
 import com.google.common.collect.ImmutableList;
 
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -15,8 +15,17 @@ public class Input {
     private int pos = -1;
 
     public Input(String input) {
-        this.args = ImmutableList.copyOf(parse(input, true));
+        this.args = parse(input, true);
         this.rawInput = input;
+    }
+
+    private Input(String raw, List<String> args) {
+        this.rawInput = raw;
+        this.args = args;
+    }
+
+    public boolean isEmpty() {
+        return args.isEmpty();
     }
 
     public boolean hasNext() {
@@ -36,6 +45,20 @@ public class Input {
             throw new CommandException("Not enough args provided: '%s'", rawInput);
         }
         return args.get(++pos);
+    }
+
+    public Input trimFirstToken() {
+        int index = rawInput.indexOf(' ');
+        if (index == -1) {
+            return new Input("", Collections.emptyList());
+        }
+
+        ImmutableList.Builder<String> builder = ImmutableList.builder();
+        for (int i = 1; i < args.size(); i++) {
+            builder.add(args.get(i));
+        }
+
+        return new Input(rawInput.substring(index + 1), builder.build());
     }
 
     public Input slice(int start) {
@@ -98,7 +121,7 @@ public class Input {
     }
 
     private static List<String> parse(String args, boolean quotes) {
-        List<String> results = new LinkedList<>();
+        ImmutableList.Builder<String> builder = ImmutableList.builder();
 
         outer:
         for (int i = 0, end = args.length(); i < end; i++) {
@@ -123,13 +146,13 @@ public class Input {
             }
 
             String s = args.substring(from, i);
-            results.add(s);
+            builder.add(s);
         }
 
         if (args.endsWith(" ")) {
-            results.add("");
+            builder.add("");
         }
 
-        return results;
+        return builder.build();
     }
 }

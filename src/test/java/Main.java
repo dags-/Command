@@ -51,9 +51,9 @@ public class Main extends JFrame implements KeyListener {
                 .provider(Object.class, dependent())
                 .build();
 
-        bus = SimpleCommandBus.<Command<Object>>builder()
+        bus = SimpleCommandBus.<SimpleCommand>builder()
                 .elements(factory)
-                .commands(Command::new)
+                .commands(SimpleCommand::new)
                 .build(SimpleCommandBus::new);
 
         bus.register(new TestCommands()).submit();
@@ -118,7 +118,7 @@ public class Main extends JFrame implements KeyListener {
             Input input = new Input(raw);
             Optional<Command<?>> command = bus.getCommand(input.next());
             if (command.isPresent()) {
-                command.get().processCommand(null, input.slice(input.getCursor()).getRawInput());
+                command.get().processCommand(null, input.trimFirstToken().getRawInput());
             } else {
                 System.out.println("Command not found!");
             }
@@ -132,7 +132,7 @@ public class Main extends JFrame implements KeyListener {
             Input input = new Input(raw);
             Optional<Command<?>> command = bus.getCommand(input.next());
             if (command.isPresent()) {
-                suggestions = command.get().suggestCommand(null, input.slice(input.getCursor()).getRawInput());
+                suggestions = command.get().suggestCommand(null, input.trimFirstToken().getRawInput());
                 System.out.println(suggestions);
             } else {
                 System.out.println("Command not found!");

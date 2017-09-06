@@ -18,9 +18,9 @@ public class TestCommands {
     }
 
     @Permission
-    @Command("user promote <user>")
-    public void twoA(String user) {
-        System.out.printf("PromoteA user: %s", user);
+    @Command("print")
+    public void twoA() {
+        System.out.printf("This command is working?\n");
     }
 
     @Permission

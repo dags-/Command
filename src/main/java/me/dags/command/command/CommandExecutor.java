@@ -68,6 +68,10 @@ public class CommandExecutor {
             }
         }
 
+        if (input.isEmpty() && elements.isEmpty()) {
+            return context;
+        }
+
         int priority = 0;
         for (Element element : elements) {
             try {
