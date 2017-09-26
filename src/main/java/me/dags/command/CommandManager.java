@@ -24,13 +24,17 @@ public abstract class CommandManager<T extends Command<?>> {
 
     public CommandManager(Builder<T> builder) {
         this.owner = builder.owner;
-        this.registrar = Registrar.of(builder.elementFactory, builder.commandFactory);
+        this.registrar = Registrar.of(this, builder.elementFactory, builder.commandFactory);
 
     }
 
     public Object getOwner() {
         checkAccess();
         return owner;
+    }
+
+    public String getOwnerId() {
+        return "command";
     }
 
     public CommandManager<T> registerPackage(Class<?> child) {

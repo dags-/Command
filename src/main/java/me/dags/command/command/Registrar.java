@@ -1,5 +1,6 @@
 package me.dags.command.command;
 
+import me.dags.command.CommandManager;
 import me.dags.command.annotation.processor.Processor;
 import me.dags.command.element.ElementFactory;
 
@@ -11,15 +12,21 @@ import java.util.stream.Collectors;
  */
 public class Registrar<T extends Command<?>> {
 
+    private final CommandManager manager;
     private final Processor processor = new Processor(this);
     private final Map<String, Entry> builders = new HashMap<>();
 
     private final ElementFactory elementFactory;
     private final CommandFactory<T> commandFactory;
 
-    public Registrar(ElementFactory elementFactory, CommandFactory<T> commandFactory) {
+    public Registrar(CommandManager manager, ElementFactory elementFactory, CommandFactory<T> commandFactory) {
+        this.manager = manager;
         this.elementFactory = elementFactory;
         this.commandFactory = commandFactory;
+    }
+
+    public CommandManager getManager() {
+        return manager;
     }
 
     public CommandFactory<T> getCommandFactory() {
@@ -62,8 +69,8 @@ public class Registrar<T extends Command<?>> {
                 .collect(Collectors.toList());
     }
 
-    public static <T extends Command<?>> Registrar<T> of(ElementFactory elementFactory, CommandFactory<T> commandFactory) {
-        return new Registrar<>(elementFactory, commandFactory);
+    public static <T extends Command<?>> Registrar<T> of(CommandManager<T> manager, ElementFactory elementFactory, CommandFactory<T> commandFactory) {
+        return new Registrar<>(manager, elementFactory, commandFactory);
     }
 
     private static class Entry {

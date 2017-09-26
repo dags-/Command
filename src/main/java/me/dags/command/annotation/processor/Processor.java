@@ -41,7 +41,7 @@ public class Processor {
                 LinkedList<Token> tokens = new Tokenizer(command.value()).parse();
                 if (tokens.size() > 0) {
                     Token root = tokens.pollFirst();
-                    CommandExecutor executor = processMethod(o, method, tokens);
+                    CommandExecutor executor = processMethod(o, method, root, tokens);
                     registrar.register(root.getAliases(), executor);
                     count++;
                 }
@@ -51,9 +51,9 @@ public class Processor {
         return count;
     }
 
-    private CommandExecutor processMethod(Object object, Method method, LinkedList<Token> tokens) {
-        Usage usage = getUsage(method, tokens);
-        Permission permission = getPermission(method, tokens);
+    private CommandExecutor processMethod(Object object, Method method, Token root, LinkedList<Token> tokens) {
+        Usage usage = getUsage(method, root, tokens);
+        Permission permission = getPermission(method, root, tokens);
         Description description = getDescription(method);
 
         List<Param> params = new ArrayList<>();
@@ -134,7 +134,7 @@ public class Processor {
         return builder.build();
     }
 
-    private static Usage getUsage(Method method, List<Token> tokens) {
+    private Usage getUsage(Method method, Token root, List<Token> tokens) {
         Usage usage = method.getAnnotation(Usage.class);
         if (usage != null) {
             return usage;
@@ -161,7 +161,7 @@ public class Processor {
             flagBuilder.insert(0, " (").append(")");
         }
 
-        final String value = join(tokens, " ", "<", ">") + flagBuilder.toString();
+        final String value = join(root, tokens, "", " ", "<", ">") + flagBuilder.toString();
 
         return new Usage() {
 
@@ -177,7 +177,7 @@ public class Processor {
         };
     }
 
-    private static Permission getPermission(Method method, List<Token> tokens) {
+    private Permission getPermission(Method method, Token root, List<Token> tokens) {
         Permission permission = method.getAnnotation(Permission.class);
 
         final String node;
@@ -186,7 +186,7 @@ public class Processor {
         if (permission == null) {
             node = "";
         } else if (permission.value().isEmpty()) {
-            node = join(tokens, ".", "", "");
+            node = join(root, tokens, registrar.getManager().getOwnerId(), ".", "", "");
         } else {
             node = permission.value();
         }
@@ -210,12 +210,12 @@ public class Processor {
         };
     }
 
-    private static Description getDescription(Method method) {
+    private Description getDescription(Method method) {
         Description description = method.getAnnotation(Description.class);
         return description == null ? EMPTY_DESCRIPTION : description;
     }
 
-    private static final Role EMPTY_ROLE = new Role() {
+    private final Role EMPTY_ROLE = new Role() {
 
         @Override
         public Class<? extends Annotation> annotationType() {
@@ -246,12 +246,17 @@ public class Processor {
         }
     };
 
-    private static String join(List<Token> tokens, String separator, String startVal, String endVal) {
+    private static String join(Token root, List<Token> tokens, String prefix, String separator, String startVal, String endVal) {
         StringBuilder builder = new StringBuilder();
+
+        if (!prefix.isEmpty()) {
+            builder.append(prefix).append(separator);
+        }
+
+        builder.append(root.getAlias());
+
         for (Token token : tokens) {
-            if (builder.length() > 0) {
-                builder.append(separator);
-            }
+            builder.append(separator);
 
             if (token.isNode()) {
                 builder.append(token.getAlias());
@@ -259,6 +264,7 @@ public class Processor {
                 builder.append(startVal).append(token.getAlias()).append(endVal);
             }
         }
+
         return builder.toString();
     }
 }
