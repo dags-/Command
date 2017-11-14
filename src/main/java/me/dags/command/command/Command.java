@@ -9,6 +9,8 @@ import java.util.*;
  */
 public class Command<T> {
 
+    private static final int SUGGESTION_LIMIT = 20;
+
     private final List<CommandExecutor> executors;
     private final List<String> aliases;
 
@@ -39,7 +41,6 @@ public class Command<T> {
                 } catch (CommandException e) {
                     exceptions.add(e);
                 }
-
             } else {
                 exceptions.add(new CommandException("Requires the permission %s", permission));
             }
@@ -54,6 +55,7 @@ public class Command<T> {
 
     public List<String> suggestCommand(T source, String rawInput) {
         Input input = new Input(rawInput);
+
         List<String> suggestions = new LinkedList<>();
         for (CommandExecutor executor : executors) {
             if (testPermission(source, executor.getPermission().value())) {
@@ -62,7 +64,14 @@ public class Command<T> {
                 input.setPos(pos);
             }
         }
-        return suggestions;
+
+        List<String> sorted = new ArrayList<>(suggestions);
+        Collections.sort(sorted, Comparator.comparing(String::length));
+        while (sorted.size() > SUGGESTION_LIMIT) {
+            sorted.remove(sorted.size() - 1);
+        }
+
+        return sorted;
     }
 
     public List<String> getAliases() {
