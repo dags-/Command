@@ -107,6 +107,7 @@ public class CommandExecutor {
             } catch (CommandException e) {
                 input.setPos(pos);
                 element.suggest(input, context, suggestions);
+                break;
             }
         }
     }

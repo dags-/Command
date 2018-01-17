@@ -55,13 +55,11 @@ public class Command<T> {
 
     public List<String> suggestCommand(T source, String rawInput) {
         Input input = new Input(rawInput);
-
         List<String> suggestions = new LinkedList<>();
+
         for (CommandExecutor executor : executors) {
             if (testPermission(source, executor.getPermission().value())) {
-                int pos = input.getPos();
                 executor.getSuggestions(source, input, suggestions);
-                input.setPos(pos);
             }
         }
 

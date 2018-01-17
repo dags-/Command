@@ -31,6 +31,14 @@ public class ChainElement<D, T> implements Element {
         filter = builder.filter;
     }
 
+    public String getKey() {
+        return key;
+    }
+
+    public Class<D> getDependency() {
+        return dependency;
+    }
+
     @Override
     public void parse(Input input, Context context) throws CommandException {
         D d = context.getLast(dependency.getCanonicalName());
