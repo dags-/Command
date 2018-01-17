@@ -19,8 +19,8 @@ public class MarkdownWriter implements Closeable {
     }
 
     public MarkdownWriter writeHeaders() {
-        write("| Command | Permission | Default Role  | Description |").newLine();
-        write("| :------ | :--------- | :-----------  | :---------- |");
+        write("| Command | Permission | Description |").newLine();
+        write("| :------ | :--------- | :---------- |");
         return this;
     }
 
