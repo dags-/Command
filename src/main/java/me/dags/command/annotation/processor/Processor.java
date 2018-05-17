@@ -1,7 +1,20 @@
 package me.dags.command.annotation.processor;
 
 import com.google.common.collect.ImmutableMap;
-import me.dags.command.annotation.*;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import me.dags.command.annotation.Command;
+import me.dags.command.annotation.Description;
+import me.dags.command.annotation.Flag;
+import me.dags.command.annotation.Permission;
+import me.dags.command.annotation.Role;
+import me.dags.command.annotation.Usage;
 import me.dags.command.command.CommandExecutor;
 import me.dags.command.command.Registrar;
 import me.dags.command.element.Element;
@@ -11,11 +24,6 @@ import me.dags.command.element.function.Filter;
 import me.dags.command.element.function.Options;
 import me.dags.command.element.function.ValueParser;
 import me.dags.command.utils.IDGenerator;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.util.*;
 
 /**
  * @author dags <dags@dags.me>

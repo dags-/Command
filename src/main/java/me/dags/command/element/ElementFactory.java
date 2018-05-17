@@ -2,14 +2,13 @@ package me.dags.command.element;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 import me.dags.command.annotation.processor.Param;
 import me.dags.command.element.function.Filter;
 import me.dags.command.element.function.Options;
 import me.dags.command.element.function.ValueParser;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
 
 /**
  * @author dags <dags@dags.me>

@@ -1,13 +1,18 @@
 plugins {
-    id 'com.github.johnrengelman.shadow' version '1.2.4'
+    id 'com.github.johnrengelman.shadow' version '2.0.0'
     id 'java'
     id 'maven'
 }
 
 group 'me.dags'
-version '0.1-SNAPSHOT'
+version '0.1.1-SNAPSHOT'
 
 sourceCompatibility = targetCompatibility = '1.8'
+
+configurations {
+    shade
+    compile.extendsFrom shade
+}
 
 repositories {
     mavenCentral()
@@ -15,13 +20,11 @@ repositories {
 
 dependencies {
     compile 'com.google.guava:guava:17.0'
-    compile 'io.github.lukehutch:fast-classpath-scanner:2.0.16'
+    shade 'io.github.lukehutch:fast-classpath-scanner:2.0.16'
 }
 
 shadowJar {
-    dependencies {
-        include dependency('io.github.lukehutch:fast-classpath-scanner')
-    }
+    configurations = [project.configurations.shade]
     relocate 'io.github.lukehutch.fastclasspathscanner', 'me.dags.command.fcps'
     classifier = null
 }

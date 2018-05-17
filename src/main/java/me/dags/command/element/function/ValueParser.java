@@ -1,12 +1,11 @@
 package me.dags.command.element.function;
 
 import com.google.common.collect.ImmutableMap;
-import me.dags.command.command.CommandException;
-import me.dags.command.command.Input;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
+import me.dags.command.command.CommandException;
+import me.dags.command.command.Input;
 
 /**
  * @author dags <dags@dags.me>

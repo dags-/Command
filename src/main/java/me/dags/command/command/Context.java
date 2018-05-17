@@ -3,11 +3,10 @@ package me.dags.command.command;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.LinkedListMultimap;
-import me.dags.command.annotation.processor.Param;
-import me.dags.command.utils.ClassUtils;
-
 import java.util.List;
 import java.util.Optional;
+import me.dags.command.annotation.processor.Param;
+import me.dags.command.utils.ClassUtils;
 
 /**
  * @author dags <dags@dags.me>

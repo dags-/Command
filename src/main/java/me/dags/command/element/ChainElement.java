@@ -1,16 +1,15 @@
 package me.dags.command.element;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import me.dags.command.command.CommandException;
 import me.dags.command.command.Context;
 import me.dags.command.command.Input;
 import me.dags.command.element.function.ChainOptions;
 import me.dags.command.element.function.ChainParser;
 import me.dags.command.element.function.Filter;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author dags <dags@dags.me>

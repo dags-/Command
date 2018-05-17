@@ -1,12 +1,11 @@
 package me.dags.command.element;
 
+import java.util.List;
+import java.util.Set;
 import me.dags.command.annotation.processor.Param;
 import me.dags.command.command.CommandException;
 import me.dags.command.command.Context;
 import me.dags.command.command.Input;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author dags <dags@dags.me>

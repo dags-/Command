@@ -1,7 +1,6 @@
 package me.dags.command.command;
 
 import com.google.common.collect.ImmutableList;
-
 import java.util.Collections;
 import java.util.List;
 

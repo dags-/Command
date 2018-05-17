@@ -1,11 +1,10 @@
 package me.dags.command.utils;
 
-import me.dags.command.annotation.Role;
-import me.dags.command.command.CommandExecutor;
-
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
+import me.dags.command.annotation.Role;
+import me.dags.command.command.CommandExecutor;
 
 /**
  * @author dags <dags@dags.me>

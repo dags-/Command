@@ -1,14 +1,13 @@
 package me.dags.command.command;
 
+import java.lang.reflect.Method;
+import java.util.Comparator;
+import java.util.List;
 import me.dags.command.annotation.Description;
 import me.dags.command.annotation.Permission;
 import me.dags.command.annotation.Usage;
 import me.dags.command.annotation.processor.Param;
 import me.dags.command.element.Element;
-
-import java.lang.reflect.Method;
-import java.util.Comparator;
-import java.util.List;
 
 /**
  * @author dags <dags@dags.me>

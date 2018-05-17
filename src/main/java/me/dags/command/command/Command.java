@@ -1,8 +1,12 @@
 package me.dags.command.command;
 
 import com.google.common.collect.ImmutableList;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author dags <dags@dags.me>

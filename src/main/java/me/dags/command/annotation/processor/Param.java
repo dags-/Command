@@ -1,13 +1,12 @@
 package me.dags.command.annotation.processor;
 
+import java.lang.reflect.Parameter;
+import java.lang.reflect.ParameterizedType;
+import java.util.Collection;
 import me.dags.command.annotation.Join;
 import me.dags.command.annotation.Src;
 import me.dags.command.command.Flags;
 import me.dags.command.utils.IDGenerator;
-
-import java.lang.reflect.Parameter;
-import java.lang.reflect.ParameterizedType;
-import java.util.Collection;
 
 /**
  * @author dags <dags@dags.me>

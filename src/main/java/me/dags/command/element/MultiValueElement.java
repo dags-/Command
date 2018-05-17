@@ -1,11 +1,10 @@
 package me.dags.command.element;
 
+import java.util.LinkedList;
+import java.util.List;
 import me.dags.command.command.CommandException;
 import me.dags.command.command.Context;
 import me.dags.command.command.Input;
-
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * @author dags <dags@dags.me>

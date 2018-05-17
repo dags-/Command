@@ -1,5 +1,6 @@
 package me.dags.command.element;
 
+import java.util.List;
 import me.dags.command.annotation.processor.Param;
 import me.dags.command.command.CommandException;
 import me.dags.command.command.Context;
@@ -7,8 +8,6 @@ import me.dags.command.command.Input;
 import me.dags.command.element.function.Filter;
 import me.dags.command.element.function.Options;
 import me.dags.command.element.function.ValueParser;
-
-import java.util.List;
 
 /**
  * @author dags <dags@dags.me>
