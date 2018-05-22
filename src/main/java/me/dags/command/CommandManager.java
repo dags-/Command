@@ -2,6 +2,11 @@ package me.dags.command;
 
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 import io.github.lukehutch.fastclasspathscanner.scanner.ScanResult;
+import me.dags.command.command.Command;
+import me.dags.command.command.CommandFactory;
+import me.dags.command.command.Registrar;
+import me.dags.command.element.ElementFactory;
+
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,10 +14,6 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import me.dags.command.command.Command;
-import me.dags.command.command.CommandFactory;
-import me.dags.command.command.Registrar;
-import me.dags.command.element.ElementFactory;
 
 /**
  * @author dags <dags@dags.me>
@@ -55,7 +56,11 @@ public abstract class CommandManager<T extends Command<?>> {
     public CommandManager<T> registerPackage(boolean recurse, String... path) {
         checkAccess();
         info("Scanning package %s for commands...", Arrays.toString(path));
-        ScanResult result = new FastClasspathScanner(path).disableRecursiveScanning(!recurse).scan();
+        ScanResult result = new FastClasspathScanner(path)
+                .enableMethodAnnotationIndexing()
+                .disableRecursiveScanning(!recurse)
+                .scan();
+
         List<String> matches = result.getNamesOfClassesWithMethodAnnotation(me.dags.command.annotation.Command.class);
         info("Discovered %s Command classes in package %s", matches.size(), path);
         for (String name : matches) {
