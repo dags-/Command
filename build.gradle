@@ -13,5 +13,9 @@ repositories {
 }
 
 dependencies {
-    compile 'com.google.guava:guava:17.0'
+    compile 'com.google.guava:guava:21.0'
+}
+
+install.repositories.mavenInstaller.pom.whenConfigured { pom ->
+    pom.dependencies.removeAll { it.scope == "compile" }
 }
