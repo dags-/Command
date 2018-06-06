@@ -1,17 +1,19 @@
 package me.dags.command;
 
 import com.google.common.reflect.ClassPath;
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.function.Function;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import me.dags.command.command.Command;
 import me.dags.command.command.CommandFactory;
 import me.dags.command.command.Registrar;
 import me.dags.command.element.ElementFactory;
+
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Collection;
+import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author dags <dags@dags.me>
@@ -128,27 +130,37 @@ public abstract class CommandManager<T extends Command<?>> {
 
         if (o instanceof Class) {
             c = (Class) o;
-            try {
-                Constructor con = c.getConstructor();
-                if (!con.isAccessible()) {
-                    return false;
-                }
-            } catch (NoSuchMethodException e) {
+            if (!hasDefaultConstructor(c)) {
                 return false;
             }
         } else {
             c = o.getClass();
         }
 
+        return hasAnnotatedMethods(c);
+    }
+
+    private static boolean hasDefaultConstructor(Class<?> c) {
+        try {
+            Constructor con = c.getConstructor();
+            if (!Modifier.isPublic(con.getModifiers())) {
+                return false;
+            }
+            return false;
+        } catch (NoSuchMethodException e) {
+            return false;
+        }
+    }
+
+    private static boolean hasAnnotatedMethods(Class<?> c) {
         while (c != Object.class) {
-            for (Method method : c.getDeclaredMethods()) {
+            for (Method method : c.getMethods()) {
                 if (method.isAnnotationPresent(me.dags.command.annotation.Command.class)) {
                     return true;
                 }
             }
             c = c.getSuperclass();
         }
-
         return false;
     }
 
