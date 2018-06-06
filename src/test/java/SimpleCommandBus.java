@@ -1,11 +1,13 @@
+import java.io.IOException;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import me.dags.command.CommandManager;
 import me.dags.command.command.Command;
-import me.dags.command.command.CommandExecutor;
 import me.dags.command.utils.MarkdownWriter;
-
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author dags <dags@dags.me>
@@ -37,17 +39,20 @@ public class SimpleCommandBus extends CommandManager<SimpleCommand> {
 
     public void writeDocumentation(Appendable appendable) {
         try (MarkdownWriter writer = new MarkdownWriter(appendable)) {
+            // write table headers
             writer.writeHeaders();
 
             commands.entrySet().stream()
+                    // sort SimpleCommands by root
                     .sorted(Comparator.comparing(Map.Entry::getKey))
                     .map(Map.Entry::getValue)
-                    .distinct()
-                    .map(Command::getExecutors)
-                    .forEach(list -> list.stream()
-                            .sorted(CommandExecutor.ALPHABETICAL_ORDER)
-                            .forEach(writer::writeCommand)
-                    );
+                    // get child executors
+                    .map(SimpleCommand::getExecutors)
+                    .flatMap(List::stream)
+                    // sort on usage string
+                    .sorted(Comparator.comparing(c -> c.getUsage().value()))
+                    // write
+                    .forEach(writer::writeCommand);
         } catch (IOException e) {
             e.printStackTrace();
         }

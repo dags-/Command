@@ -28,7 +28,7 @@ public class CommandExecutor {
         return Integer.compare(e1.elements.size(), e2.elements.size());
     };
 
-    public static final Comparator<CommandExecutor> ALPHABETICAL_ORDER = (e1, e2) -> e1.getUsage().value().compareTo(e2.getUsage().value());
+    public static final Comparator<CommandExecutor> ALPHABETICAL_ORDER = Comparator.comparing(e -> e.getUsage().value());
 
     private final Object object;
     private final Method method;
@@ -90,6 +90,10 @@ public class CommandExecutor {
     }
 
     public void getSuggestions(Object source, Input input, List<String> suggestions) {
+        if (elements.isEmpty()) {
+            return;
+        }
+
         input.reset();
         Context context = new Context(source);
         context.add("#suggest", true);
@@ -109,6 +113,17 @@ public class CommandExecutor {
                 break;
             }
         }
+    }
+
+    public void getFirstSuggestion(Object source, Input input, List<String> suggestions) {
+        if (elements.isEmpty()) {
+            return;
+        }
+        input.reset();
+        Context context = new Context(source);
+        context.add("#suggest", true);
+        Element first = elements.get(0);
+        first.suggest(input, context, suggestions);
     }
 
     public void invoke(Context context) throws CommandException {

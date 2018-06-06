@@ -1,11 +1,10 @@
 package me.dags.command;
 
-import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
-import io.github.lukehutch.fastclasspathscanner.scanner.ScanResult;
+import com.google.common.reflect.ClassPath;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.util.Arrays;
+import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,39 +46,45 @@ public abstract class CommandManager<T extends Command<?>> {
         return registerPackage(recursive, child.getPackage().getName());
     }
 
-    public CommandManager<T> registerPackage(String... path) {
+    public CommandManager<T> registerPackage(String path) {
         checkAccess();
         return registerPackage(true, path);
     }
 
-    public CommandManager<T> registerPackage(boolean recurse, String... path) {
+    public CommandManager<T> registerPackage(boolean recurse, String path) {
         checkAccess();
-        info("Scanning package %s for commands...", Arrays.toString(path));
-        ScanResult result = new FastClasspathScanner(path).disableRecursiveScanning(!recurse).scan();
-        List<String> matches = result.getNamesOfClassesWithMethodAnnotation(me.dags.command.annotation.Command.class);
-        info("Discovered %s Command classes in package %s", matches.size(), path);
-        for (String name : matches) {
-            try {
-                Class<?> clazz = Class.forName(name);
-                register(clazz);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+        info("Scanning package %s for commands...", path);
+        try {
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            Collection<ClassPath.ClassInfo> classes;
+            if (recurse) {
+                classes = ClassPath.from(classLoader).getTopLevelClassesRecursive(path);
+            } else {
+                classes = ClassPath.from(classLoader).getTopLevelClasses(path);
             }
+            for (ClassPath.ClassInfo info : classes) {
+                try {
+                    Class<?> c = Class.forName(info.getName());
+                    register(c);
+                } catch (ClassNotFoundException e) {
+                    warn("%s", e);
+                }
+            }
+        } catch (IOException e) {
+            warn("%s", e);
         }
         return this;
     }
 
     public CommandManager<T> register(Class<?> c) {
         checkAccess();
-        for (Constructor<?> con : c.getConstructors()) {
-            if (con.getParameterCount() == 0 || con.isVarArgs()) {
-                try {
-                    Object o = c.newInstance();
-                    register(o);
-                } catch (Throwable t) {
-                    t.printStackTrace();
-                }
-                return this;
+        if (isValidExecutor(c)) {
+            try {
+                Object o = c.newInstance();
+                int count = registrar.register(o);
+                info("Registered %s command(s) from %s", count, o.getClass());
+            } catch (IllegalAccessException | InstantiationException e) {
+                warn("%s", e);
             }
         }
         return this;
@@ -87,8 +92,10 @@ public abstract class CommandManager<T extends Command<?>> {
 
     public CommandManager<T> register(Object o) {
         checkAccess();
-        int count = registrar.register(o);
-        info("Registered %s command(s) from %s", count, o.getClass());
+        if (isValidExecutor(o)) {
+            int count = registrar.register(o);
+            info("Registered %s command(s) from %s", count, o.getClass());
+        }
         return this;
     }
 
@@ -100,13 +107,13 @@ public abstract class CommandManager<T extends Command<?>> {
         }
     }
 
+    protected abstract void submit(Object owner, T command);
+
     private void checkAccess() {
         if (registrar == null) {
             throw new IllegalStateException("Attempted to access Registrar after it has been disposed!");
         }
     }
-
-    protected abstract void submit(Object owner, T command);
 
     protected void info(String message, Object... args) {
         Logger.getLogger("CommandBus").info(String.format(message, args));
@@ -114,6 +121,35 @@ public abstract class CommandManager<T extends Command<?>> {
 
     protected void warn(String message, Object... args) {
         Logger.getLogger("CommandBus").log(Level.WARNING, String.format(message, args));
+    }
+
+    private static boolean isValidExecutor(Object o) {
+        Class<?> c;
+
+        if (o instanceof Class) {
+            c = (Class) o;
+            try {
+                Constructor con = c.getConstructor();
+                if (!con.isAccessible()) {
+                    return false;
+                }
+            } catch (NoSuchMethodException e) {
+                return false;
+            }
+        } else {
+            c = o.getClass();
+        }
+
+        while (c != Object.class) {
+            for (Method method : c.getDeclaredMethods()) {
+                if (method.isAnnotationPresent(me.dags.command.annotation.Command.class)) {
+                    return true;
+                }
+            }
+            c = c.getSuperclass();
+        }
+
+        return false;
     }
 
     public static <T extends Command<?>> Builder<T> builder() {

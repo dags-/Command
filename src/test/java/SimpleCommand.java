@@ -1,7 +1,6 @@
+import java.util.Collection;
 import me.dags.command.command.Command;
 import me.dags.command.command.CommandExecutor;
-
-import java.util.Collection;
 
 /**
  * @author dags <dags@dags.me>

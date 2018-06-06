@@ -61,19 +61,28 @@ public class Command<T> {
         Input input = new Input(rawInput);
         List<String> suggestions = new LinkedList<>();
 
-        for (CommandExecutor executor : executors) {
-            if (testPermission(source, executor.getPermission().value())) {
-                executor.getSuggestions(source, input, suggestions);
+        if (!input.hasNext()) {
+            for (CommandExecutor executor : executors) {
+                if (testPermission(source, executor.getPermission().value())) {
+                    executor.getFirstSuggestion(source, input, suggestions);
+                }
             }
+            Collections.sort(suggestions);
+        } else {
+            for (CommandExecutor executor : executors) {
+                if (testPermission(source, executor.getPermission().value())) {
+                    executor.getSuggestions(source, input, suggestions);
+                }
+            }
+            suggestions.sort(Comparator.comparing(String::length));
         }
 
-        List<String> sorted = new ArrayList<>(suggestions);
-        Collections.sort(sorted, Comparator.comparing(String::length));
-        while (sorted.size() > SUGGESTION_LIMIT) {
-            sorted.remove(sorted.size() - 1);
+        List<String> limited = new ArrayList<>(suggestions);
+        while (limited.size() > SUGGESTION_LIMIT) {
+            limited.remove(limited.size() - 1);
         }
 
-        return sorted;
+        return limited;
     }
 
     public List<String> getAliases() {
