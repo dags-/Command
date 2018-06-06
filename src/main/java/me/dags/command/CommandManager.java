@@ -143,10 +143,7 @@ public abstract class CommandManager<T extends Command<?>> {
     private static boolean hasDefaultConstructor(Class<?> c) {
         try {
             Constructor con = c.getConstructor();
-            if (!Modifier.isPublic(con.getModifiers())) {
-                return false;
-            }
-            return false;
+            return Modifier.isPublic(con.getModifiers());
         } catch (NoSuchMethodException e) {
             return false;
         }
