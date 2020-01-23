@@ -1,12 +1,8 @@
 package me.dags.command.command;
 
 import com.google.common.collect.ImmutableList;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+
+import java.util.*;
 
 /**
  * @author dags <dags@dags.me>
@@ -77,12 +73,17 @@ public class Command<T> {
             suggestions.sort(Comparator.comparing(String::length));
         }
 
-        List<String> limited = new ArrayList<>(suggestions);
-        while (limited.size() > SUGGESTION_LIMIT) {
-            limited.remove(limited.size() - 1);
+        List<String> results = new ArrayList<>(SUGGESTION_LIMIT);
+        for (String suggestion : suggestions) {
+            if (!results.contains(suggestion)) {
+                results.add(suggestion);
+                if (results.size() >= SUGGESTION_LIMIT) {
+                    break;
+                }
+            }
         }
 
-        return limited;
+        return results;
     }
 
     public List<String> getAliases() {

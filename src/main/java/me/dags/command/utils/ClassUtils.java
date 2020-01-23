@@ -25,7 +25,7 @@ public class ClassUtils {
 
     public static Object cast(Object in, Class<?> type) {
         if (Number.class.isAssignableFrom(type)) {
-            Number number = Number.class.cast(in);
+            Number number = (Number) in;
             if (type == float.class || type == Float.class) {
                 return number.floatValue();
             }
